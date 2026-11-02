@@ -9,7 +9,7 @@ window.SITE = {
   "h1b": "a graphic designer",
   "intro": "Branding, editorial, packaging and textile design from Dhaka, Bangladesh.",
   "teaserTitle": "Design that gives brands a voice",
-  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Have Bachelor's Degree inGraphic Design.",
+  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Have Bachelor's Degree in Graphic Design.",
   "featTitle": "Featured work",
   "featText": "A few of my favourite projects.",
   "marquee": "Showcasing creative potential with Siam",
@@ -40,7 +40,7 @@ window.SITE = {
     "img": ""
    }
   ],
-  "floatSpeed": 7.5
+  "floatSpeed": 6
  },
  "about": {
   "title": "Aflahal Muminun, known as Siam",
@@ -68,25 +68,25 @@ window.SITE = {
  "contact": {
   "title": "Get in touch",
   "intro": "Have a project in mind? Send a message and I’ll reply soon.",
-  "email": "hello@example.com",
-  "phone": "+880 0000 000000",
+  "email": "muminun.siam97@gmail.com",
+  "phone": "+880 1628216436",
   "location": "Dhaka, Bangladesh",
   "socials": [
    {
     "n": "Facebook",
-    "u": "#"
+    "u": "#https://www.facebook.com/nisan.siam"
    },
    {
     "n": "Instagram",
-    "u": "#"
+    "u": "#https://www.instagram.com/nisansiam/"
    },
    {
     "n": "Behance",
-    "u": "#"
+    "u": "#https://www.behance.net/aflahalmuminun"
    },
    {
     "n": "LinkedIn",
-    "u": "#"
+    "u": "#https://www.linkedin.com/in/aflahal-muminun-a3b295178/"
    }
   ]
  },
