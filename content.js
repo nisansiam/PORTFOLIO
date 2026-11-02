@@ -1,12 +1,14 @@
 window.SITE = {
- "brand": {"name": "SIAM", "tag": "DESIGN", "full": "Aflahal Muminun"},
+ "brand": {"name": "SIAM", "tag": "DESIGN", "full": "Aflahal Muminun", "logoMode": "text", "logoImg": ""},
+ "layout": "grid",
  "home": {
   "h1a": "Hey, I’m Siam,", "h1b": "a graphic designer",
   "intro": "Branding, editorial, packaging and textile design from Dhaka, Bangladesh.",
   "teaserTitle": "Design that gives brands a voice",
-  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Most people call me Siam.",
+  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Most people call me Siam.\nI design brand identities, magazines, school brochures and fabric prints, moving between print and digital work with the same eye for detail.\nRight now I’m growing into motion design and UI/UX, so the work can live on screen as well as on paper.",
   "featTitle": "Featured work", "featText": "A few of my favourite projects.",
   "marquee": "Showcasing creative potential with Siam", "giant": "Portfolio",
+  "floatSpeed": 3,
   "floats": [{"img": ""}, {"img": ""}, {"img": ""}, {"img": ""}]
  },
  "about": {

@@ -24,6 +24,7 @@ h2{margin:0 0 6px;font-size:22px}h3{margin:18px 0 8px;font-size:17px}
 label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
 label.ck{display:flex;gap:10px;align-items:center}
 input[type=text],input:not([type]),textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+select{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
 textarea{min-height:100px;resize:vertical}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -54,13 +55,15 @@ var tabs=['Site','Home','About','Projects','Contact','Publish'];
 function el(h){var t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild}
 function save(){document.getElementById('st').textContent='Saving…';clearTimeout(t0);t0=setTimeout(function(){DB.set('draft',S).then(function(){document.getElementById('st').textContent='Saved in this browser (not live yet)'})},300)}
 function fld(o,k,label,area){var w=el('<div><label>'+label+'</label></div>'),i=el(area?'<textarea></textarea>':'<input type="text">');i.value=o[k]||'';i.oninput=function(){o[k]=i.value;save()};w.appendChild(i);return w}
+function sel(o,k,label,opts){var w=el('<div><label>'+label+'</label></div>'),i=el('<select>'+opts.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join('')+'</select>');i.value=o[k]||opts[0][0];i.onchange=function(){o[k]=i.value;save()};w.appendChild(i);return w}
+function lpic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/png'))};im.src=r.result};r.readAsDataURL(file)})}
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
 function add(p,list){list.forEach(function(x){p.appendChild(x)});return p}
 function btn(t,fn,c){var b=el('<button class="'+(c||'')+'">'+t+'</button>');b.onclick=fn;return b}
 function pic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-function upload(multi,fn){var i=el('<input type="file" accept="image/*"'+(multi?' multiple':'')+'>');i.onchange=function(){Promise.all([].slice.call(i.files).map(pic)).then(fn)};i.click()}
+function upload(multi,fn,conv){var i=el('<input type="file" accept="image/*"'+(multi?' multiple':'')+'>');i.onchange=function(){Promise.all([].slice.call(i.files).map(conv||pic)).then(fn)};i.click()}
 function moveList(a,i,d){var j=i+d;if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;save();draw()}
 function items(o,k,fields,blank,label){
  var w=document.createElement('div');
@@ -73,7 +76,12 @@ function items(o,k,fields,blank,label){
 var views={
  Site:function(m){
   var b=box('Site','Logo, your full name and footer text. The full name appears in the footer and About page.');
-  add(b,[fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page')]);m.appendChild(b)},
+  add(b,[sel(S.brand,'logoMode','Logo style',[['text','Name only'],['image','Uploaded logo only'],['both','Uploaded logo and name']]),fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page')]);
+  var lr=el('<div class="row"></div>');lr.appendChild(el('<label style="margin:0">Logo image</label>'));
+  if(S.brand.logoImg)lr.appendChild(el('<img class="big" style="max-width:120px;background:#888;padding:6px;border-radius:8px" src="'+S.brand.logoImg+'" alt="">'));
+  lr.appendChild(btn(S.brand.logoImg?'Replace logo':'Upload logo',function(){upload(0,function(r){S.brand.logoImg=r[0];if(!S.brand.logoMode||S.brand.logoMode==='text')S.brand.logoMode='image';save();draw()},lpic)}));
+  if(S.brand.logoImg)lr.appendChild(btn('Remove logo',function(){S.brand.logoImg='';S.brand.logoMode='text';save();draw()},'del'));
+  b.appendChild(lr);b.appendChild(el('<p class="hint">PNG or SVG with a transparent background works best. Choose “Logo style” above to show the logo, the name, or both.</p>'));m.appendChild(b)},
  Home:function(m){
   var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
   add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b);
@@ -85,6 +93,9 @@ var views={
    r.appendChild(btn(f.img?'Replace image':'Add image',function(){upload(0,function(x){f.img=x[0];save();draw()})}));
    r.appendChild(btn('↑',function(){moveList(H.floats,i,-1)}));r.appendChild(btn('↓',function(){moveList(H.floats,i,1)}));
    r.appendChild(btn('Remove',function(){H.floats.splice(i,1);save();draw()},'del'));c.appendChild(r)});
+  var sp=el('<div><label>Card movement speed: <b></b></label><input type="range" min="0" max="10" step="0.5"><p class="hint">0 keeps the cards still, 3 is the default, 10 is very fast. Use Preview site to see it.</p></div>'),rg=sp.querySelector('input'),vl=sp.querySelector('b');
+  rg.value=H.floatSpeed==null?3:H.floatSpeed;vl.textContent=rg.value;rg.oninput=function(){H.floatSpeed=parseFloat(rg.value);vl.textContent=rg.value;save()};
+  c.insertBefore(sp,c.children[2]);
   if(H.floats.length<10)c.appendChild(el('<div class="row"></div>')).appendChild(btn('+ Add card',function(){H.floats.push({img:''});save();draw()},'pri'));
   m.appendChild(c)},
  About:function(m){
@@ -94,7 +105,7 @@ var views={
   var b=box('Contact','The contact form opens the visitor’s email app, addressed to the email below.');
   add(b,[fld(S.contact,'title','Title'),fld(S.contact,'intro','Intro',1),fld(S.contact,'email','Email'),fld(S.contact,'phone','Phone'),fld(S.contact,'location','Location'),el('<h3>Social links</h3>'),items(S.contact,'socials',[['n','Name'],['u','Link (full web address)']],{n:'New link',u:'https://'},'link')]);m.appendChild(b)},
  Projects:function(m){
-  var h=box('Projects','Open a project to edit it. Tick “Show on Home page” to feature it. Images are resized automatically.');m.appendChild(h);
+  var h=box('Projects','Open a project to edit it. Tick “Show on Home page” to feature it. Images are resized automatically.');h.appendChild(sel(S,'layout','Project layout (Home featured work and Work page)',[['grid','Neat grid, equal sizes'],['natural','Natural sizes, follows each cover image']]));m.appendChild(h);
   S.projects.forEach(function(p,i){
    var d=el('<details><summary><img alt="" src="'+(p.cover||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')+'"><span>'+(p.title||'Untitled')+'</span></summary><div class="inner"></div></details>'),n=d.lastChild;
    if(p._open)d.open=true;d.ontoggle=function(){p._open=d.open};
@@ -114,15 +125,39 @@ var views={
    m.appendChild(d)});
   m.appendChild(btn('+ Add project',function(){S.projects.push({id:'p'+Date.now(),title:'New project',summary:'',desc:'',tags:[],client:'',date:'',role:'Graphic designer',featured:false,cover:'',images:[],color:'p2',_open:true});save();draw()},'pri'))},
  Publish:function(m){
-  var b=box('Publish to GitHub','Your edits are saved in this browser only. To put them on your live site:');
+  direct(m);
+  var b=box('Or publish by hand','Your edits are saved in this browser only. If you prefer not to use a token:');
   b.appendChild(el('<ol class="steps"><li>Click <b>Download content.js</b> (top right).</li><li>Open your GitHub repository and choose <b>Add file → Upload files</b>.</li><li>Drag the downloaded <b>content.js</b> in. It replaces the old one.</li><li>Click <b>Commit changes</b>. The live site updates in a minute or two.</li></ol>'));
   b.appendChild(el('<p class="hint">Visitors can open this page, but nothing changes on the live site until you upload content.js, so only you can publish. Edit and download from the same browser, and download again after each round of edits.</p>'));
   var r=el('<div class="row"></div>');r.appendChild(btn('Download content.js',dl,'pri'));
   r.appendChild(btn('Discard my edits and go back to the live version',function(){if(confirm('Discard all unpublished edits in this browser?'))DB.del('draft').then(function(){S=JSON.parse(JSON.stringify(window.SITE));draw()})},'del'));b.appendChild(r);m.appendChild(b)}
 };
-function dl(){
- var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});
- var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['window.SITE = '+JSON.stringify(D,null,1)+';\n'],{type:'text/javascript'}));a.download='content.js';a.click()}
+function out(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});return 'window.SITE = '+JSON.stringify(D,null,1)+';\n'}
+function dl(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out()],{type:'text/javascript'}));a.download='content.js';a.click()}
+function b64(str){var b=new TextEncoder().encode(str),s='';for(var i=0;i<b.length;i+=32768)s+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(s)}
+function gh(g,st){
+ var url='https://api.github.com/repos/'+encodeURIComponent(g.owner.trim())+'/'+encodeURIComponent(g.repo.trim())+'/contents/content.js',br=(g.branch||'main').trim(),
+ hd={'Authorization':'Bearer '+g.token.trim(),'Accept':'application/vnd.github+json'};
+ st('Checking the repository…');
+ return fetch(url+'?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return null;if(!r.ok){var e=new Error('');e.status=r.status;throw e}return r.json()}).then(function(j){
+  st('Uploading your edits…');var o={message:'Update site content from admin panel',content:b64(out()),branch:br};if(j&&j.sha)o.sha=j.sha;
+  return fetch(url,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},hd),body:JSON.stringify(o)})}).then(function(r){
+  if(r.ok){st('Published. The live site updates in a minute or two.');return}
+  return r.json().then(function(x){var e=new Error(x.message||'');e.status=r.status;throw e})})}
+function direct(m){
+ var w=document.createElement('div');m.appendChild(w);
+ DB.get('gh').then(function(g){g=g||{owner:'',repo:'',branch:'main',token:''};
+  var b=box('Publish directly','Set this up once. After that, one click puts your edits live with no download or upload.'),f=el('<div class="two"></div>');
+  add(f,[fld(g,'owner','GitHub username'),fld(g,'repo','Repository name'),fld(g,'branch','Branch (usually main)')]);
+  var t=el('<div><label>Access token</label><input type="password" autocomplete="off"></div>'),ti=t.lastChild;ti.value=g.token||'';ti.oninput=function(){g.token=ti.value};f.appendChild(t);b.appendChild(f);
+  var s=el('<p class="hint" role="status"></p>'),st=function(x){s.textContent=x},r=el('<div class="row"></div>');
+  r.appendChild(btn('Publish now',function(){
+   if(!g.owner||!g.repo||!g.token){st('Fill in your username, repository name and token first.');return}
+   DB.set('gh',g);gh(g,st).catch(function(x){st('Could not publish: '+(x.status===401?'GitHub did not accept the token. It may be wrong or expired.':(x.status===404||x.status===403)?'repository not found, or the token lacks “Contents: Read and write” access to it.':(x.message||'check your internet connection and try again.')))})},'pri'));
+  r.appendChild(btn('Forget saved settings',function(){DB.del('gh').then(function(){draw()})}));b.appendChild(r);b.appendChild(s);
+  b.appendChild(el('<h3>Create the token (one time)</h3>'));
+  b.appendChild(el('<ol class="steps"><li>On github.com open your profile picture → <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Fine-grained tokens</b> → <b>Generate new token</b>.</li><li>Name it “Portfolio admin” and set an expiry date.</li><li>Under <b>Repository access</b> choose <b>Only select repositories</b> and pick your portfolio repository.</li><li>Under <b>Permissions → Repository permissions</b> set <b>Contents</b> to <b>Read and write</b>.</li><li>Generate, copy the token, paste it above, and click <b>Publish now</b>.</li></ol><p class="hint">The token is stored only in this browser, never in your site files. Don’t use this on a shared computer. If it ever leaks, delete it on GitHub and make a new one.</p>'));
+  w.appendChild(b)})}
 function draw(){
  var n=document.getElementById('tabs');n.innerHTML='';
  tabs.forEach(function(t){var b=btn(t,function(){tab=t;draw()},t===tab?'on':'');n.appendChild(b)});

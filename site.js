@@ -12,18 +12,28 @@ var S,drafted=false,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches
 function bg(p){return p.cover?' img" style="background-image:url(&quot;'+e(p.cover)+'&quot;)':' '+e(p.color||'p1')}
 function ph(p,cls){return '<div class="'+(cls||'ph')+bg(p)+'">'+(p.cover?'':e(p.title))+'</div>'}
 function tags(a){return '<div class="tags">'+(a||[]).map(function(t){return '<span class="tag">'+e(t)+'</span>'}).join('')+'</div>'}
-function card(p,link){
- var inner=ph(p)+'<h3>'+e(p.title)+'</h3><p>'+e(p.summary)+'</p>'+tags(p.tags);
+function card(p,link,i){
+ var inner=pic2(p,i||0)+'<h3>'+e(p.title)+'</h3><p>'+e(p.summary)+'</p>'+tags(p.tags);
  return link?'<a class="card" href="work.html#'+e(p.id)+'">'+inner+'</a>':'<button class="card" data-id="'+e(p.id)+'">'+inner+'</button>';
 }
+function logo(){var B=S.brand,m=B.logoMode||'text',h='';
+ if((m==='image'||m==='both')&&B.logoImg)h+='<img class="lg" src="'+e(B.logoImg)+'" alt="'+e(B.name)+'">';
+ if(m==='text'||m==='both'||!B.logoImg)h+='<span class="lt">'+e(B.name)+' <span>'+e(B.tag)+'</span></span>';
+ return '<a class="logo" href="index.html" aria-label="Home">'+h+'</a>'}
+function pic2(p,i){
+ if(S.layout==='natural'){
+  if(p.cover)return '<img class="nat" src="'+e(p.cover)+'" alt="'+e(p.title)+'" loading="lazy">';
+  return '<div class="ph '+e(p.color||'p1')+'" style="aspect-ratio:'+['4/5','1/1','3/4','16/10'][i%4]+'">'+e(p.title)+'</div>';
+ }
+ return ph(p)}
 function head(){
  var B=S.brand;
- return '<header class="wrap"><a class="logo" href="index.html" aria-label="Home">'+e(B.name)+' <span>'+e(B.tag)+'</span></a><div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
+ return '<header class="wrap">'+logo()+'<div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
  '<nav id="menu" aria-label="Main"><button class="x" id="close" aria-label="Close menu">×</button><a class="big" href="index.html">Home</a><a class="big" href="about.html">About</a><a class="big" href="work.html">Work</a><a class="big" href="contact.html">Contact</a><div class="soc">'+S.contact.socials.map(function(s){return '<a href="'+e(s.u)+'">'+e(s.n)+'</a>'}).join('')+'</div></nav>';
 }
 function foot(){
  var B=S.brand,C=S.contact;
- return '<footer><div class="wrap"><div class="ft"><div><a class="logo" href="index.html">'+e(B.name)+' <span>'+e(B.tag)+'</span></a><small>Based in</small><address>'+e(C.location)+'</address><small>Contact</small><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></div>'+
+ return '<footer><div class="wrap"><div class="ft"><div>'+logo()+'<small>Based in</small><address>'+e(C.location)+'</address><small>Contact</small><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></div>'+
  '<div class="nav"><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="work.html">Work</a></li><li><a href="contact.html">Contact</a></li></ul><ul>'+C.socials.map(function(s){return '<li><a href="'+e(s.u)+'">'+e(s.n)+'</a></li>'}).join('')+'</ul></div></div>'+
  '<div class="copy"><span>© '+new Date().getFullYear()+' '+e(B.full)+'. All rights reserved.</span><span class="dim">'+e(B.name)+' · Graphic design, '+e(C.location)+'</span></div>'+
  (page==='home'?'<div class="giant" aria-hidden="true">'+e(S.home.giant)+'</div>':'')+'</div></footer>';
@@ -35,10 +45,10 @@ var views={
   var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){return '<div class="fl f'+(i+1)+bg({cover:q.img,color:'p'+(i%4+1)})+'" data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"></div>'}).join('');
   return '<div class="hero wrap">'+fl+'<h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
   '<section><div class="wrap two"><h2>'+e(H.teaserTitle)+'</h2><div><p>'+e(H.teaserText)+'</p><div class="btns" style="justify-content:flex-start;margin-top:28px"><a class="pill" href="about.html">More about me <i>↗</i></a></div></div></div></section>'+
-  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects">'+F.map(function(p){return card(p,true)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+marquee();
+  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+marquee();
  },
  work:function(){
-  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects">'+S.projects.map(function(p){return card(p)}).join('')+'</div></div></section>'+
+  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,false,i)}).join('')+'</div></div></section>'+
   '<dialog id="dlg" aria-label="Project details"></dialog>';
  },
  about:function(){
@@ -60,7 +70,7 @@ function wire(){
  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')tog(false)});
  if(page==='home'&&!reduce){
   var fl=[].slice.call(document.querySelectorAll('.fl')),m1=document.getElementById('m1'),m2=document.getElementById('m2'),mq=document.querySelector('.mq');
-  var tick=function(){var y=scrollY,vh=innerHeight;fl.forEach(function(el){el.style.transform='translateY('+(-y*parseFloat(el.dataset.s)*2)+'px)'});
+  var tick=function(){var y=scrollY,vh=innerHeight;fl.forEach(function(el){el.style.transform='translateY('+(-y*parseFloat(el.dataset.s)*2*(S.home.floatSpeed==null?3:S.home.floatSpeed))+'px)'});
    var r=mq.getBoundingClientRect(),p=(vh-r.top)/(vh+r.height);m1.style.transform='translateX('+(-p*30+10)+'%)';m2.style.transform='translateX('+(p*30-40)+'%)'};
   addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
  }
