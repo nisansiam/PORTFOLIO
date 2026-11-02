@@ -32,7 +32,7 @@ function marquee(){return '<div class="mq" aria-hidden="true"><div id="m1">'+e(S
 function featured(){return S.projects.filter(function(p){return p.featured})}
 var views={
  home:function(){
-  var H=S.home,F=featured(),fl=F.slice(0,4).map(function(p,i){return '<div class="fl f'+(i+1)+bg(p)+'" data-s="'+[.06,-.04,.09,-.07][i]+'">'+(p.cover?'':e(p.title))+'</div>'}).join('');
+  var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){return '<div class="fl f'+(i+1)+bg({cover:q.img,color:'p'+(i%4+1)})+'" data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"></div>'}).join('');
   return '<div class="hero wrap">'+fl+'<h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
   '<section><div class="wrap two"><h2>'+e(H.teaserTitle)+'</h2><div><p>'+e(H.teaserText)+'</p><div class="btns" style="justify-content:flex-start;margin-top:28px"><a class="pill" href="about.html">More about me <i>↗</i></a></div></div></div></section>'+
   '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects">'+F.map(function(p){return card(p,true)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+marquee();

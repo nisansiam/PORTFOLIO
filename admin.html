@@ -76,7 +76,17 @@ var views={
   add(b,[fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page')]);m.appendChild(b)},
  Home:function(m){
   var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
-  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b)},
+  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b);
+  var H=S.home;H.floats=H.floats||[];
+  var c=box('Floating cards in the hero','The images that drift beside the headline. Use up to 10 and show as many as you like. They are separate from your project covers.');
+  H.floats.forEach(function(f,i){
+   var r=el('<div class="row"></div>');
+   r.appendChild(f.img?el('<img class="big" style="max-width:120px" src="'+f.img+'" alt="">'):el('<span class="hint">No image yet (shows a colour block)</span>'));
+   r.appendChild(btn(f.img?'Replace image':'Add image',function(){upload(0,function(x){f.img=x[0];save();draw()})}));
+   r.appendChild(btn('↑',function(){moveList(H.floats,i,-1)}));r.appendChild(btn('↓',function(){moveList(H.floats,i,1)}));
+   r.appendChild(btn('Remove',function(){H.floats.splice(i,1);save();draw()},'del'));c.appendChild(r)});
+  if(H.floats.length<10)c.appendChild(el('<div class="row"></div>')).appendChild(btn('+ Add card',function(){H.floats.push({img:''});save();draw()},'pri'));
+  m.appendChild(c)},
  About:function(m){
   var b=box('About page');
   add(b,[fld(S.about,'title','Title'),fld(S.about,'text','Text',1),fld(S.about,'tools','Tools (separate with commas)'),el('<h3>Skill boxes</h3>'),items(S.about,'skills',[['t','Heading'],['d','Description',1]],{t:'New skill',d:''},'skill box')]);m.appendChild(b)},

@@ -6,7 +6,8 @@ window.SITE = {
   "teaserTitle": "Design that gives brands a voice",
   "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Most people call me Siam.",
   "featTitle": "Featured work", "featText": "A few of my favourite projects.",
-  "marquee": "Showcasing creative potential with Siam", "giant": "Portfolio"
+  "marquee": "Showcasing creative potential with Siam", "giant": "Portfolio",
+  "floats": [{"img": ""}, {"img": ""}, {"img": ""}, {"img": ""}]
  },
  "about": {
   "title": "Aflahal Muminun, known as Siam",
