@@ -56,14 +56,16 @@ function el(h){var t=document.createElement('template');t.innerHTML=h.trim();ret
 function save(){document.getElementById('st').textContent='Saving…';clearTimeout(t0);t0=setTimeout(function(){DB.set('draft',S).then(function(){document.getElementById('st').textContent='Saved in this browser (not live yet)'})},300)}
 function fld(o,k,label,area){var w=el('<div><label>'+label+'</label></div>'),i=el(area?'<textarea></textarea>':'<input type="text">');i.value=o[k]||'';i.oninput=function(){o[k]=i.value;save()};w.appendChild(i);return w}
 function sel(o,k,label,opts){var w=el('<div><label>'+label+'</label></div>'),i=el('<select>'+opts.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join('')+'</select>');i.value=o[k]||opts[0][0];i.onchange=function(){o[k]=i.value;save()};w.appendChild(i);return w}
-function lpic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/png'))};im.src=r.result};r.readAsDataURL(file)})}
+function lpic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=im.naturalWidth||300,h=im.naturalHeight||300,s=Math.min(1,600/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/png'))};im.src=r.result};r.readAsDataURL(file)})}
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
 function add(p,list){list.forEach(function(x){p.appendChild(x)});return p}
 function btn(t,fn,c){var b=el('<button class="'+(c||'')+'">'+t+'</button>');b.onclick=fn;return b}
 function pic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-function upload(multi,fn,conv){var i=el('<input type="file" accept="image/*"'+(multi?' multiple':'')+'>');i.onchange=function(){Promise.all([].slice.call(i.files).map(conv||pic)).then(fn)};i.click()}
+function upload(multi,fn,conv){var i=document.createElement('input');i.type='file';i.accept='image/*';i.multiple=!!multi;i.style.display='none';document.body.appendChild(i);
+ i.onchange=function(){var fs=[].slice.call(i.files);document.body.removeChild(i);if(fs.length)Promise.all(fs.map(conv||pic)).then(fn).catch(function(){alert('That image could not be read. Try a JPG or PNG.')})};
+ i.addEventListener('cancel',function(){if(i.parentNode)document.body.removeChild(i)});i.click()}
 function moveList(a,i,d){var j=i+d;if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;save();draw()}
 function items(o,k,fields,blank,label){
  var w=document.createElement('div');
@@ -85,6 +87,10 @@ var views={
  Home:function(m){
   var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
   add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b);
+  var fb=box('Projects featured on the Home page','Tick the projects to show on Home, as many or as few as you like. They appear in the same order as in the Projects tab.');
+  S.projects.forEach(function(p){fb.appendChild(el('<div class="row"></div>')).appendChild(ck(p,'featured',(p.title||'Untitled')))});
+  if(!S.projects.length)fb.appendChild(el('<p class="hint">No projects yet. Add one in the Projects tab.</p>'));
+  m.appendChild(fb);
   var H=S.home;H.floats=H.floats||[];
   var c=box('Floating cards in the hero','The images that drift beside the headline. Use up to 10 and show as many as you like. They are separate from your project covers.');
   H.floats.forEach(function(f,i){
