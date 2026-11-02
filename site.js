@@ -79,9 +79,9 @@ function wire(){
   var show=function(id){
    var p=S.projects.filter(function(x){return x.id===id})[0];if(!p)return;
    var imgs=(p.images||[]).map(function(s){return '<img src="'+e(s)+'" alt="'+e(p.title)+'" loading="lazy">'}).join('');
-   dlg.innerHTML='<div class="bar"><button class="pill" id="dx" style="padding:8px 18px">Close</button></div>'+ph(p)+
+   dlg.innerHTML='<div class="bar"><button class="pill" id="dx" style="padding:8px 18px">Close</button></div>'+(p.cover?'<img class="nat" style="border-radius:0;margin:0;max-height:70vh;object-fit:contain;background:#000" src="'+e(p.cover)+'" alt="'+e(p.title)+'">':ph(p))+
    '<div class="body"><div><h3>'+e(p.title)+'</h3><p class="desc">'+e(p.desc)+'</p>'+tags(p.tags)+'</div><dl><div><dt>Client</dt><dd>'+e(p.client||'—')+'</dd></div><div><dt>Date</dt><dd>'+e(p.date||'—')+'</dd></div><div><dt>Role</dt><dd>'+e(p.role||'—')+'</dd></div></dl></div>'+(imgs?'<div class="gal">'+imgs+'</div>':'');
-   dlg.querySelector('.ph').style.margin='0';
+   var q=dlg.querySelector('.ph');if(q)q.style.margin='0';
    document.getElementById('dx').onclick=function(){dlg.close()};
    dlg.querySelectorAll('.gal img').forEach(function(im){im.onclick=function(){window.open(im.src,'_blank')}});
    if(!dlg.open)dlg.showModal();dlg.scrollTop=0;history.replaceState(null,'','#'+id);
