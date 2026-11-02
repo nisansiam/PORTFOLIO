@@ -9,7 +9,7 @@ window.SITE = {
   "h1b": "a graphic designer",
   "intro": "Branding, editorial, packaging and textile design from Dhaka, Bangladesh.",
   "teaserTitle": "Design that gives brands a voice",
-  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Most people call me Siam.",
+  "teaserText": "I’m Aflahal Muminun, a graphic designer in Dhaka. Have Bachelor's Degree inGraphic Design.",
   "featTitle": "Featured work",
   "featText": "A few of my favourite projects.",
   "marquee": "Showcasing creative potential with Siam",
@@ -40,7 +40,7 @@ window.SITE = {
     "img": ""
    }
   ],
-  "floatSpeed": 10
+  "floatSpeed": 7.5
  },
  "about": {
   "title": "Aflahal Muminun, known as Siam",
