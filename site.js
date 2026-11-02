@@ -1,0 +1,99 @@
+(function(){
+var DB=window.SiteDB={
+ o:function(){return new Promise(function(ok,no){var r=indexedDB.open('siam-site',1);r.onupgradeneeded=function(){r.result.createObjectStore('k')};r.onsuccess=function(){ok(r.result)};r.onerror=no})},
+ get:function(k){return DB.o().then(function(d){return new Promise(function(ok){var q=d.transaction('k').objectStore('k').get(k);q.onsuccess=function(){ok(q.result)};q.onerror=function(){ok()}})}).catch(function(){})},
+ set:function(k,v){return DB.o().then(function(d){return new Promise(function(ok){var t=d.transaction('k','readwrite');t.objectStore('k').put(v,k);t.oncomplete=ok})}).catch(function(){})},
+ del:function(k){return DB.o().then(function(d){return new Promise(function(ok){var t=d.transaction('k','readwrite');t.objectStore('k').delete(k);t.oncomplete=ok})}).catch(function(){})}
+};
+var page=document.body.dataset.page;
+if(!page)return;
+function e(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+var S,drafted=false,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function bg(p){return p.cover?' img" style="background-image:url(&quot;'+e(p.cover)+'&quot;)':' '+e(p.color||'p1')}
+function ph(p,cls){return '<div class="'+(cls||'ph')+bg(p)+'">'+(p.cover?'':e(p.title))+'</div>'}
+function tags(a){return '<div class="tags">'+(a||[]).map(function(t){return '<span class="tag">'+e(t)+'</span>'}).join('')+'</div>'}
+function card(p,link){
+ var inner=ph(p)+'<h3>'+e(p.title)+'</h3><p>'+e(p.summary)+'</p>'+tags(p.tags);
+ return link?'<a class="card" href="work.html#'+e(p.id)+'">'+inner+'</a>':'<button class="card" data-id="'+e(p.id)+'">'+inner+'</button>';
+}
+function head(){
+ var B=S.brand;
+ return '<header class="wrap"><a class="logo" href="index.html" aria-label="Home">'+e(B.name)+' <span>'+e(B.tag)+'</span></a><div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
+ '<nav id="menu" aria-label="Main"><button class="x" id="close" aria-label="Close menu">×</button><a class="big" href="index.html">Home</a><a class="big" href="about.html">About</a><a class="big" href="work.html">Work</a><a class="big" href="contact.html">Contact</a><div class="soc">'+S.contact.socials.map(function(s){return '<a href="'+e(s.u)+'">'+e(s.n)+'</a>'}).join('')+'</div></nav>';
+}
+function foot(){
+ var B=S.brand,C=S.contact;
+ return '<footer><div class="wrap"><div class="ft"><div><a class="logo" href="index.html">'+e(B.name)+' <span>'+e(B.tag)+'</span></a><small>Based in</small><address>'+e(C.location)+'</address><small>Contact</small><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></div>'+
+ '<div class="nav"><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="work.html">Work</a></li><li><a href="contact.html">Contact</a></li></ul><ul>'+C.socials.map(function(s){return '<li><a href="'+e(s.u)+'">'+e(s.n)+'</a></li>'}).join('')+'</ul></div></div>'+
+ '<div class="copy"><span>© '+new Date().getFullYear()+' '+e(B.full)+'. All rights reserved.</span><span class="dim">'+e(B.name)+' · Graphic design, '+e(C.location)+'</span></div>'+
+ (page==='home'?'<div class="giant" aria-hidden="true">'+e(S.home.giant)+'</div>':'')+'</div></footer>';
+}
+function marquee(){return '<div class="mq" aria-hidden="true"><div id="m1">'+e(S.home.marquee)+'</div><div id="m2">'+e(S.home.marquee)+'</div></div>'}
+function featured(){return S.projects.filter(function(p){return p.featured})}
+var views={
+ home:function(){
+  var H=S.home,F=featured(),fl=F.slice(0,4).map(function(p,i){return '<div class="fl f'+(i+1)+bg(p)+'" data-s="'+[.06,-.04,.09,-.07][i]+'">'+(p.cover?'':e(p.title))+'</div>'}).join('');
+  return '<div class="hero wrap">'+fl+'<h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
+  '<section><div class="wrap two"><h2>'+e(H.teaserTitle)+'</h2><div><p>'+e(H.teaserText)+'</p><div class="btns" style="justify-content:flex-start;margin-top:28px"><a class="pill" href="about.html">More about me <i>↗</i></a></div></div></div></section>'+
+  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects">'+F.map(function(p){return card(p,true)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+marquee();
+ },
+ work:function(){
+  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects">'+S.projects.map(function(p){return card(p)}).join('')+'</div></div></section>'+
+  '<dialog id="dlg" aria-label="Project details"></dialog>';
+ },
+ about:function(){
+  var A=S.about;
+  return '<section class="top"><div class="wrap"><div class="two"><h2>'+e(A.title)+'</h2><p>'+e(A.text)+'</p></div><div class="grid">'+A.skills.map(function(k){return '<div class="tile"><h3>'+e(k.t)+'</h3><p>'+e(k.d)+'</p></div>'}).join('')+'</div>'+
+  '<div class="tools">'+A.tools.split(',').map(function(t){return t.trim()?'<span class="tag">'+e(t.trim())+'</span>':''}).join('')+'</div><div class="btns" style="justify-content:flex-start;margin-top:48px"><a class="pill" href="contact.html">Work with me <i>↗</i></a></div></div></section>';
+ },
+ contact:function(){
+  var C=S.contact;
+  return '<section class="top"><div class="wrap contact"><div><h2>'+e(C.title)+'</h2><p class="dim" style="margin-top:20px">'+e(C.intro)+'</p><ul class="cl"><li><span>✉</span><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></li><li><span>☎</span>'+e(C.phone)+'</li><li><span>⌖</span>'+e(C.location)+'</li></ul></div>'+
+  '<form id="f"><label>First name<input name="fn" required autocomplete="given-name"></label><label>Last name<input name="ln" autocomplete="family-name"></label><label>Email<input name="em" type="email" required autocomplete="email"></label><label>Phone number<input name="ph" type="tel" autocomplete="tel"></label><label class="full">Message<textarea name="msg" required placeholder="Tell me about your project…"></textarea></label><button type="submit">Send message</button><div id="fs" role="status"></div></form></div></section>';
+ }
+};
+function wire(){
+ var menu=document.getElementById('menu'),open=document.getElementById('open');
+ function tog(v){menu.classList.toggle('open',v);open.setAttribute('aria-expanded',v);document.body.style.overflow=v?'hidden':''}
+ open.onclick=function(){tog(true)};document.getElementById('close').onclick=function(){tog(false)};
+ menu.addEventListener('click',function(ev){if(ev.target.closest('a.big'))tog(false)});
+ document.addEventListener('keydown',function(ev){if(ev.key==='Escape')tog(false)});
+ if(page==='home'&&!reduce){
+  var fl=[].slice.call(document.querySelectorAll('.fl')),m1=document.getElementById('m1'),m2=document.getElementById('m2'),mq=document.querySelector('.mq');
+  var tick=function(){var y=scrollY,vh=innerHeight;fl.forEach(function(el){el.style.transform='translateY('+(-y*parseFloat(el.dataset.s)*2)+'px)'});
+   var r=mq.getBoundingClientRect(),p=(vh-r.top)/(vh+r.height);m1.style.transform='translateX('+(-p*30+10)+'%)';m2.style.transform='translateX('+(p*30-40)+'%)'};
+  addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();
+ }
+ if(page==='work'){
+  var dlg=document.getElementById('dlg');
+  var show=function(id){
+   var p=S.projects.filter(function(x){return x.id===id})[0];if(!p)return;
+   var imgs=(p.images||[]).map(function(s){return '<img src="'+e(s)+'" alt="'+e(p.title)+'" loading="lazy">'}).join('');
+   dlg.innerHTML='<div class="bar"><button class="pill" id="dx" style="padding:8px 18px">Close</button></div>'+ph(p)+
+   '<div class="body"><div><h3>'+e(p.title)+'</h3><p class="desc">'+e(p.desc)+'</p>'+tags(p.tags)+'</div><dl><div><dt>Client</dt><dd>'+e(p.client||'—')+'</dd></div><div><dt>Date</dt><dd>'+e(p.date||'—')+'</dd></div><div><dt>Role</dt><dd>'+e(p.role||'—')+'</dd></div></dl></div>'+(imgs?'<div class="gal">'+imgs+'</div>':'');
+   dlg.querySelector('.ph').style.margin='0';
+   document.getElementById('dx').onclick=function(){dlg.close()};
+   dlg.querySelectorAll('.gal img').forEach(function(im){im.onclick=function(){window.open(im.src,'_blank')}});
+   if(!dlg.open)dlg.showModal();dlg.scrollTop=0;history.replaceState(null,'','#'+id);
+  };
+  document.querySelectorAll('.card').forEach(function(c){c.onclick=function(){show(c.dataset.id)}});
+  dlg.addEventListener('click',function(ev){if(ev.target===dlg)dlg.close()});
+  dlg.addEventListener('close',function(){history.replaceState(null,'',location.pathname)});
+  if(location.hash.length>1)show(decodeURIComponent(location.hash.slice(1)));
+ }
+ var f=document.getElementById('f');
+ if(f)f.onsubmit=function(ev){ev.preventDefault();var d=new FormData(f),b='From: '+d.get('fn')+' '+d.get('ln')+' ('+d.get('em')+', '+d.get('ph')+')\n\n'+d.get('msg');
+  location.href='mailto:'+S.contact.email+'?subject='+encodeURIComponent('Portfolio enquiry')+'&body='+encodeURIComponent(b);
+  document.getElementById('fs').textContent='Opening your email app to send the message.'};
+ if(drafted){var b=document.createElement('div');b.id='pv';b.innerHTML='Previewing your unpublished edits <button id="pvx">Show live version</button>';document.body.appendChild(b);
+  document.getElementById('pvx').onclick=function(){DB.del('draft').then(function(){location.reload()})}}
+}
+DB.get('draft').then(function(d){
+ if(d&&d.brand&&d.projects){S=d;drafted=true}else S=window.SITE;
+ var titles={home:'Portfolio',work:'Work',about:'About',contact:'Contact'};
+ document.title=titles[page]+' – '+S.brand.full+' ('+S.brand.name+')';
+ document.getElementById('app').innerHTML=head()+'<main>'+views[page]()+'</main>'+foot();
+ wire();
+ if(location.hash&&page!=='work'){var t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}
+});
+})();

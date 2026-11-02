@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Site editor</title>
+<style>
+:root{--bg:#f4f4f2;--card:#fff;--fg:#141414;--mute:#6b6b6b;--line:#d9d9d5;--ac:#141414;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#141414;--card:#202020;--fg:#f2f2f0;--mute:#9a9a9a;--line:#333;--ac:#fff}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top b{font-size:18px;margin-right:auto}
+button,.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:9px 14px;cursor:pointer;text-decoration:none;display:inline-block}
+button.pri,.btn.pri{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+button.del{color:#c62828;border-color:#c62828}
+nav{display:flex;gap:8px;padding:14px 20px;flex-wrap:wrap}
+nav button.on{background:var(--ac);color:var(--bg)}
+main{max-width:900px;margin:0 auto;padding:0 20px 80px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+h2{margin:0 0 6px;font-size:22px}h3{margin:18px 0 8px;font-size:17px}
+.hint{color:var(--mute);font-size:14px;margin:0 0 14px}
+label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+label.ck{display:flex;gap:10px;align-items:center}
+input[type=text],input:not([type]),textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+textarea{min-height:100px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+details{border:1px solid var(--line);border-radius:12px;margin-bottom:12px;background:var(--card)}
+summary{padding:14px 16px;cursor:pointer;font-weight:600;display:flex;gap:12px;align-items:center}
+summary img{width:48px;height:36px;object-fit:cover;border-radius:6px;background:var(--line)}
+.inner{padding:0 16px 16px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:8px}
+.th{position:relative}
+.th img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block}
+.th button{position:absolute;top:4px;right:4px;padding:2px 8px;font-size:13px}
+.big{max-width:240px}
+.steps li{margin:6px 0}
+#st{color:var(--mute);font-size:14px}
+</style>
+</head>
+<body>
+<div class="top"><b>Site editor</b><span id="st"></span><a class="btn" href="index.html" target="_blank">Preview site</a><button class="pri" id="dl">Download content.js</button></div>
+<nav id="tabs"></nav>
+<main id="ed"></main>
+<script src="content.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+var DB=window.SiteDB,S,tab='Site',t0;
+var tabs=['Site','Home','About','Projects','Contact','Publish'];
+function el(h){var t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild}
+function save(){document.getElementById('st').textContent='Saving…';clearTimeout(t0);t0=setTimeout(function(){DB.set('draft',S).then(function(){document.getElementById('st').textContent='Saved in this browser (not live yet)'})},300)}
+function fld(o,k,label,area){var w=el('<div><label>'+label+'</label></div>'),i=el(area?'<textarea></textarea>':'<input type="text">');i.value=o[k]||'';i.oninput=function(){o[k]=i.value;save()};w.appendChild(i);return w}
+function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
+function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
+function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
+function add(p,list){list.forEach(function(x){p.appendChild(x)});return p}
+function btn(t,fn,c){var b=el('<button class="'+(c||'')+'">'+t+'</button>');b.onclick=fn;return b}
+function pic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
+function upload(multi,fn){var i=el('<input type="file" accept="image/*"'+(multi?' multiple':'')+'>');i.onchange=function(){Promise.all([].slice.call(i.files).map(pic)).then(fn)};i.click()}
+function moveList(a,i,d){var j=i+d;if(j<0||j>=a.length)return;var t=a[i];a[i]=a[j];a[j]=t;save();draw()}
+function items(o,k,fields,blank,label){
+ var w=document.createElement('div');
+ (o[k]||[]).forEach(function(it,i){
+  var b=el('<div class="box"></div>');
+  fields.forEach(function(f){b.appendChild(fld(it,f[0],f[1],f[2]))});
+  var r=el('<div class="row"></div>');r.appendChild(btn('↑',function(){moveList(o[k],i,-1)}));r.appendChild(btn('↓',function(){moveList(o[k],i,1)}));
+  r.appendChild(btn('Remove',function(){if(confirm('Remove this item?')){o[k].splice(i,1);save();draw()}},'del'));b.appendChild(r);w.appendChild(b)});
+ w.appendChild(btn('+ Add '+label,function(){o[k].push(JSON.parse(JSON.stringify(blank)));save();draw()},'pri'));return w}
+var views={
+ Site:function(m){
+  var b=box('Site','Logo, your full name and footer text. The full name appears in the footer and About page.');
+  add(b,[fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page')]);m.appendChild(b)},
+ Home:function(m){
+  var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
+  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b)},
+ About:function(m){
+  var b=box('About page');
+  add(b,[fld(S.about,'title','Title'),fld(S.about,'text','Text',1),fld(S.about,'tools','Tools (separate with commas)'),el('<h3>Skill boxes</h3>'),items(S.about,'skills',[['t','Heading'],['d','Description',1]],{t:'New skill',d:''},'skill box')]);m.appendChild(b)},
+ Contact:function(m){
+  var b=box('Contact','The contact form opens the visitor’s email app, addressed to the email below.');
+  add(b,[fld(S.contact,'title','Title'),fld(S.contact,'intro','Intro',1),fld(S.contact,'email','Email'),fld(S.contact,'phone','Phone'),fld(S.contact,'location','Location'),el('<h3>Social links</h3>'),items(S.contact,'socials',[['n','Name'],['u','Link (full web address)']],{n:'New link',u:'https://'},'link')]);m.appendChild(b)},
+ Projects:function(m){
+  var h=box('Projects','Open a project to edit it. Tick “Show on Home page” to feature it. Images are resized automatically.');m.appendChild(h);
+  S.projects.forEach(function(p,i){
+   var d=el('<details><summary><img alt="" src="'+(p.cover||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')+'"><span>'+(p.title||'Untitled')+'</span></summary><div class="inner"></div></details>'),n=d.lastChild;
+   if(p._open)d.open=true;d.ontoggle=function(){p._open=d.open};
+   add(n,[fld(p,'title','Title'),fld(p,'summary','Short line (shown on cards)'),fld(p,'desc','Full description',1),lst(p,'tags','Tags (separate with commas)'),el('<div class="two"></div>')]);
+   var g=n.lastChild;add(g,[fld(p,'client','Client'),fld(p,'date','Date'),fld(p,'role','Your role')]);
+   n.appendChild(ck(p,'featured','Show on Home page (featured)'));
+   n.appendChild(el('<h3>Cover image</h3>'));
+   var c=el('<div class="row"></div>');
+   if(p.cover)c.appendChild(el('<img class="big" src="'+p.cover+'" alt="">'));
+   c.appendChild(btn(p.cover?'Replace cover':'Add cover',function(){upload(0,function(r){p.cover=r[0];save();draw()})}));
+   if(p.cover)c.appendChild(btn('Remove cover',function(){p.cover='';save();draw()},'del'));n.appendChild(c);
+   n.appendChild(el('<h3>More images</h3>'));
+   var t=el('<div class="thumbs"></div>');(p.images||[]).forEach(function(s,j){var q=el('<div class="th"><img src="'+s+'" alt=""></div>');q.appendChild(btn('✕',function(){p.images.splice(j,1);save();draw()}));t.appendChild(q)});n.appendChild(t);
+   n.appendChild(el('<div class="row"></div>')).appendChild(btn('+ Add images',function(){upload(1,function(r){p.images=(p.images||[]).concat(r);save();draw()})}));
+   var r=el('<div class="row"></div>');r.appendChild(btn('↑ Move up',function(){moveList(S.projects,i,-1)}));r.appendChild(btn('↓ Move down',function(){moveList(S.projects,i,1)}));
+   r.appendChild(btn('Remove project',function(){if(confirm('Remove “'+p.title+'” and its images?')){S.projects.splice(i,1);save();draw()}},'del'));n.appendChild(r);
+   m.appendChild(d)});
+  m.appendChild(btn('+ Add project',function(){S.projects.push({id:'p'+Date.now(),title:'New project',summary:'',desc:'',tags:[],client:'',date:'',role:'Graphic designer',featured:false,cover:'',images:[],color:'p2',_open:true});save();draw()},'pri'))},
+ Publish:function(m){
+  var b=box('Publish to GitHub','Your edits are saved in this browser only. To put them on your live site:');
+  b.appendChild(el('<ol class="steps"><li>Click <b>Download content.js</b> (top right).</li><li>Open your GitHub repository and choose <b>Add file → Upload files</b>.</li><li>Drag the downloaded <b>content.js</b> in. It replaces the old one.</li><li>Click <b>Commit changes</b>. The live site updates in a minute or two.</li></ol>'));
+  b.appendChild(el('<p class="hint">Visitors can open this page, but nothing changes on the live site until you upload content.js, so only you can publish. Edit and download from the same browser, and download again after each round of edits.</p>'));
+  var r=el('<div class="row"></div>');r.appendChild(btn('Download content.js',dl,'pri'));
+  r.appendChild(btn('Discard my edits and go back to the live version',function(){if(confirm('Discard all unpublished edits in this browser?'))DB.del('draft').then(function(){S=JSON.parse(JSON.stringify(window.SITE));draw()})},'del'));b.appendChild(r);m.appendChild(b)}
+};
+function dl(){
+ var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});
+ var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['window.SITE = '+JSON.stringify(D,null,1)+';\n'],{type:'text/javascript'}));a.download='content.js';a.click()}
+function draw(){
+ var n=document.getElementById('tabs');n.innerHTML='';
+ tabs.forEach(function(t){var b=btn(t,function(){tab=t;draw()},t===tab?'on':'');n.appendChild(b)});
+ var m=document.getElementById('ed');m.innerHTML='';views[tab](m)}
+document.getElementById('dl').onclick=dl;
+DB.get('draft').then(function(d){S=(d&&d.brand&&d.projects)?d:JSON.parse(JSON.stringify(window.SITE));
+ document.getElementById('st').textContent=d?'Editing your saved draft':'Editing the live version';draw()});
+})();
+</script>
+</body>
+</html>
