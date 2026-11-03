@@ -161,5 +161,6 @@ window.SITE = {
    "images": [],
    "color": "p4"
   }
- ]
+ ],
+ "layout": "natural"
 };
