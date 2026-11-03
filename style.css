@@ -49,7 +49,7 @@ section{padding:clamp(72px,11vw,160px) 0;border-top:1px solid var(--line)}
 .projects{display:grid;grid-template-columns:1fr 1fr;margin-top:clamp(48px,6vw,88px)}
 .card{padding:0 30px 56px;border-left:1px solid var(--line);cursor:pointer;background:none;border-top:0;border-right:0;border-bottom:0;color:inherit;text-align:left;font:inherit;text-decoration:none;display:block}
 .ph{aspect-ratio:16/10;border-radius:10px;display:flex;align-items:flex-end;padding:22px;font:400 clamp(28px,4vw,64px)/.95 Anton,Impact,sans-serif;text-transform:uppercase;color:#fff;margin-bottom:26px;overflow:hidden;background:#333}
-.ph.img{background-size:cover;background-position:center}
+.ph.img,.fl.img{background-size:cover;background-position:center;background-repeat:no-repeat}
 .card h3{font-size:30px;font-weight:600;letter-spacing:-.02em}
 .card p{color:var(--mute);margin:6px 0 18px}
 .tags{display:flex;gap:10px;flex-wrap:wrap}
@@ -112,7 +112,12 @@ dialog dt{font-weight:700}dialog dd{color:var(--mute)}
 .me{width:100%;height:auto;display:block;border-radius:12px}
 section.brands{padding:clamp(56px,8vw,110px) 0}
 h2.sm{font-size:clamp(24px,3vw,40px)}
-.lgrow{display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,64px);justify-content:center;align-items:center;margin-top:44px}
-.lgrow img{height:clamp(30px,4vw,54px);width:auto;max-width:170px;object-fit:contain;display:block}
-.lgrow.mono img{filter:brightness(0) invert(1)}
 @media (max-width:860px){.abt{grid-template-columns:1fr}.abt .me{max-width:440px}}
+
+.mqr{overflow:hidden;margin-top:44px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mtrack{display:flex;align-items:center;width:max-content;animation:mqr 40s linear infinite}
+.mtrack>*{flex:none;display:block;margin-right:calc(var(--lh,64px)*1.2)}
+.mtrack img{height:var(--lh,64px);width:auto;max-width:none;display:block}
+.mqr.mono img{filter:brightness(0) invert(1)}
+@keyframes mqr{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mtrack{animation:none}}

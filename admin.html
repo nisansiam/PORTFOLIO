@@ -62,6 +62,11 @@ function save(){document.getElementById('st').textContent='Saving…';clearTimeo
 function fld(o,k,label,area){var w=el('<div><label>'+label+'</label></div>'),i=el(area?'<textarea></textarea>':'<input type="text">');i.value=o[k]||'';i.oninput=function(){o[k]=i.value;save()};w.appendChild(i);return w}
 function sel(o,k,label,opts){var w=el('<div><label>'+label+'</label></div>'),i=el('<select>'+opts.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join('')+'</select>');i.value=o[k]||opts[0][0];i.onchange=function(){o[k]=i.value;save()};w.appendChild(i);return w}
 function lpic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var w=im.naturalWidth||300,h=im.naturalHeight||300,s=Math.min(1,600/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/png'))};im.src=r.result};r.readAsDataURL(file)})}
+function sld(o,k,label,min,max,step,def,hint){var w=el('<div><label>'+label+': <b></b></label><input type="range" min="'+min+'" max="'+max+'" step="'+step+'"><p class="hint">'+hint+'</p></div>'),r=w.querySelector('input'),v=w.querySelector('b');r.value=o[k]==null?def:o[k];v.textContent=r.value;r.oninput=function(){o[k]=parseFloat(r.value);v.textContent=r.value;save()};return w}
+function trim(url){return new Promise(function(ok){var im=new Image();im.onerror=function(){ok(url)};im.onload=function(){var W=im.width,H=im.height,c=document.createElement('canvas');c.width=W;c.height=H;var g=c.getContext('2d');g.drawImage(im,0,0);var d=g.getImageData(0,0,W,H).data,x0=W,y0=H,x1=-1,y1=-1;
+ for(var y=0;y<H;y++)for(var i=0;i<W;i++){if(d[(y*W+i)*4+3]>10){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y}}
+ if(x1<0||(x1-x0+1>=W-1&&y1-y0+1>=H-1)){ok(url);return}
+ var w=x1-x0+1,h=y1-y0+1,o=document.createElement('canvas');o.width=w;o.height=h;o.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);ok(o.toDataURL('image/png'))};im.src=url})}
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
@@ -84,7 +89,7 @@ function crop(file,ro,n,total){return new Promise(function(done){
   var dx,dy,dr=false;cv.onpointerdown=function(e){dr=true;dx=e.clientX;dy=e.clientY;cv.setPointerCapture(e.pointerId)};
   cv.onpointermove=function(e){if(!dr)return;ox+=e.clientX-dx;oy+=e.clientY-dy;dx=e.clientX;dy=e.clientY;draw()};
   cv.onpointerup=cv.onpointercancel=function(){dr=false};
-  function end(v){document.removeEventListener('keydown',esc);document.body.removeChild(o);done(v)}
+  function end(v){document.removeEventListener('keydown',esc);document.body.removeChild(o);(ro.trim&&v?trim(v):Promise.resolve(v)).then(done)}
   function esc(e){if(e.key==='Escape')end(null)}document.addEventListener('keydown',esc);
   var ac=o.lastChild.lastChild;
   ac.appendChild(btn('Crop and save',function(){var g=geom(),k=Math.min((ro.png?800:1600)/cw,1/g.sc),c=document.createElement('canvas');c.width=Math.round(cw*k);c.height=Math.round(ch*k);var x=c.getContext('2d');if(!ro.png){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,g.x*k,g.y*k,g.w*k,g.h*k);end(ro.png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.85))},'pri'));
@@ -150,16 +155,16 @@ var views={
   fx.appendChild(el('<ol class="steps"><li>Go to <b>formspree.io</b> and create a free account.</li><li>Create a new form and enter the email where you want to receive messages.</li><li>Copy the form address (it looks like https://formspree.io/f/abcdwxyz) and paste it above.</li><li>Publish, then send yourself a test message from the Contact page. The first time, Formspree may ask you to confirm your email.</li></ol><p class="hint">The free Formspree plan has a monthly limit on messages.</p>'));
   m.appendChild(fx)},
  Brands:function(m){
-  var B=S.brands,b=box('Brands I’ve worked with','Logos shown after Featured work on the Home page and on the Work page. Add as many as you like. Transparent PNG or SVG logos work best.');
-  add(b,[fld(B,'title','Section title'),ck(B,'mono','Show all logos in white (tick this if your logos are dark and hard to see)')]);m.appendChild(b);
+  var B=S.brands,b=box('Brands I’ve worked with','Logos scroll across the page from right to left, after Featured work on the Home page and on the Work page. Add as many as you like. Transparent PNG or SVG logos work best, and empty transparent edges are trimmed automatically so every logo sits at the same height.');
+  add(b,[fld(B,'title','Section title'),ck(B,'mono','Show all logos in white (tick this if your logos are dark and hard to see)'),sld(B,'speed','Scroll speed',0,10,0.5,3,'0 stops the scrolling, 3 is the default, 10 is fast.'),sld(B,'size','Logo height (px)',30,140,2,64,'Every logo is shown at this height, and the width follows each logo’s shape.')]);m.appendChild(b);
   B.items.forEach(function(it,i){
    var c=el('<div class="box"></div>'),r=el('<div class="row"></div>');
    r.appendChild(it.img?el('<img style="height:56px;max-width:160px;object-fit:contain;background:#777;padding:6px;border-radius:8px" src="'+it.img+'" alt="">'):el('<span class="hint">No image</span>'));
-   r.appendChild(btn(it.img?'Replace logo':'Add logo',function(){upload(0,function(x){it.img=x[0];save();draw()},null,{r:RL,d:0,png:1})}));c.appendChild(r);
+   r.appendChild(btn(it.img?'Replace logo':'Add logo',function(){upload(0,function(x){it.img=x[0];save();draw()},null,{r:RL,d:0,png:1,trim:1})}));c.appendChild(r);
    add(c,[fld(it,'name','Brand name'),fld(it,'url','Link (optional)')]);
    var r2=el('<div class="row"></div>');r2.appendChild(btn('↑',function(){moveList(B.items,i,-1)}));r2.appendChild(btn('↓',function(){moveList(B.items,i,1)}));
    r2.appendChild(btn('Remove',function(){if(confirm('Remove this logo?')){B.items.splice(i,1);save();draw()}},'del'));c.appendChild(r2);m.appendChild(c)});
-  m.appendChild(btn('+ Add logos',function(){upload(1,function(x){x.forEach(function(d){B.items.push({name:'',img:d,url:''})});save();draw()},null,{r:RL,d:0,png:1})},'pri'))},
+  m.appendChild(btn('+ Add logos',function(){upload(1,function(x){x.forEach(function(d){B.items.push({name:'',img:d,url:''})});save();draw()},null,{r:RL,d:0,png:1,trim:1})},'pri'))},
  Projects:function(m){
   var h=box('Projects','Open a project to edit it. Tick “Show on Home page” to feature it. Images are resized automatically.');h.appendChild(sel(S,'layout','Project layout (Home featured work and Work page)',[['grid','Neat grid (16:10 frames)'],['natural','Natural sizes (each cover shown exactly as cropped)']]));m.appendChild(h);
   S.projects.forEach(function(p,i){
