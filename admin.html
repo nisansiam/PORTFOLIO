@@ -67,22 +67,23 @@ function trim(url){return new Promise(function(ok){var im=new Image();im.onerror
  for(var y=0;y<H;y++)for(var i=0;i<W;i++){if(d[(y*W+i)*4+3]>10){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y}}
  if(x1<0||(x1-x0+1>=W-1&&y1-y0+1>=H-1)){ok(url);return}
  var w=x1-x0+1,h=y1-y0+1,o=document.createElement('canvas');o.width=w;o.height=h;o.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);ok(o.toDataURL('image/png'))};im.src=url})}
+function hasA(im){var s=Math.min(1,200/Math.max(im.naturalWidth||im.width,im.naturalHeight||im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round((im.naturalWidth||im.width)*s));c.height=Math.max(1,Math.round((im.naturalHeight||im.height)*s));var g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);var d=g.getImageData(0,0,c.width,c.height).data;for(var i=3;i<d.length;i+=4)if(d[i]<250)return true;return false}
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
 function add(p,list){list.forEach(function(x){p.appendChild(x)});return p}
 function btn(t,fn,c){var b=el('<button class="'+(c||'')+'">'+t+'</button>');b.onclick=fn;return b}
-function pic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-var RC=[['Card 16:10',1.6],['4:3',1.3333],['1:1',1],['4:5',.8],['Whole image',0]],RE=[['Whole image',0],['4:3',1.3333],['16:10',1.6],['1:1',1],['3:4',.75]],RF=[['4:5',.8],['1:1',1],['3:4',.75],['4:3',1.3333],['Whole image',0]],SL=[.8,1,1.3333,1,1,.75,1,.8,1.3333,1],RL=[['Whole image',0],['1:1',1],['3:2',1.5],['3:1',3]],RP=[['4:5',.8],['1:1',1],['3:4',.75],['Whole image',0]];
+function pic(file){return new Promise(function(ok){var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var s=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);var x=c.getContext('2d');var a=hasA(im);if(!a){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,0,0,c.width,c.height);ok(a?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
+var RC=[['Card 16:10',1.6],['4:3',1.3333],['1:1',1],['4:5',.8],['Whole image',0]],RE=[['Whole image',0],['4:3',1.3333],['16:10',1.6],['1:1',1],['3:4',.75]],RF=[['Whole image',0],['4:5',.8],['1:1',1],['3:4',.75],['4:3',1.3333]],SL=[.8,1,1.3333,1,1,.75,1,.8,1.3333,1],RL=[['Whole image',0],['1:1',1],['3:2',1.5],['3:1',3]],RP=[['4:5',.8],['1:1',1],['3:4',.75],['Whole image',0]];
 function crop(file,ro,n,total){return new Promise(function(done){
  var rd=new FileReader();rd.onerror=function(){done(null)};rd.onload=function(){var im=new Image();im.onerror=function(){alert('That image could not be read. Try a JPG or PNG.');done(null)};im.onload=function(){
-  var iw=im.naturalWidth,ih=im.naturalHeight,ratio=ro.d,z=1,ox=0,oy=0,cw,ch,MW=Math.min(560,innerWidth-90),MH=Math.max(200,Math.min(420,innerHeight-360));
+  var iw=im.naturalWidth,ih=im.naturalHeight,ratio=ro.d,png=!!ro.png||hasA(im),z=1,ox=0,oy=0,cw,ch,MW=Math.min(560,innerWidth-90),MH=Math.max(200,Math.min(420,innerHeight-360));
   var o=el('<div class="cm"><div class="cb"><b></b><p class="hint" style="margin:4px 0 0">Drag the picture to move it. Use zoom to scale it.</p><canvas></canvas><div class="row rr"></div><label>Zoom<input type="range" min="1" max="4" step="0.01" value="1"></label><div class="row"></div></div></div>'),
   cv=o.querySelector('canvas'),cx=cv.getContext('2d'),zr=o.querySelector('input');
-  o.querySelector('b').textContent='Crop image'+(total>1?' '+(n+1)+' of '+total:'');if(ro.png)cv.className='tr';
+  o.querySelector('b').textContent='Crop image'+(total>1?' '+(n+1)+' of '+total:'');if(png)cv.className='tr';
   function geom(){var r=ratio||iw/ih;cw=MW;ch=cw/r;if(ch>MH){ch=MH;cw=ch*r}
    var sc=Math.max(cw/iw,ch/ih)*z,w=iw*sc,h=ih*sc,mx=Math.max(0,(w-cw)/2),my=Math.max(0,(h-ch)/2);ox=Math.max(-mx,Math.min(mx,ox));oy=Math.max(-my,Math.min(my,oy));return{sc:sc,x:(cw-w)/2+ox,y:(ch-h)/2+oy,w:w,h:h}}
-  function draw(){var g=geom();cv.width=Math.round(cw);cv.height=Math.round(ch);if(!ro.png){cx.fillStyle='#fff';cx.fillRect(0,0,cw,ch)}cx.drawImage(im,g.x,g.y,g.w,g.h);
+  function draw(){var g=geom();cv.width=Math.round(cw);cv.height=Math.round(ch);if(!png){cx.fillStyle='#fff';cx.fillRect(0,0,cw,ch)}cx.drawImage(im,g.x,g.y,g.w,g.h);
    [].forEach.call(o.querySelectorAll('.rr button'),function(b){b.classList.toggle('on',Math.abs(parseFloat(b.dataset.v)-ratio)<.01)})}
   var rr=o.querySelector('.rr');ro.r.forEach(function(r){var b=btn(r[0],function(){ratio=r[1];ox=oy=0;draw()});b.dataset.v=r[1];rr.appendChild(b)});
   zr.oninput=function(){z=parseFloat(zr.value);draw()};
@@ -92,7 +93,7 @@ function crop(file,ro,n,total){return new Promise(function(done){
   function end(v){document.removeEventListener('keydown',esc);document.body.removeChild(o);(ro.trim&&v?trim(v):Promise.resolve(v)).then(done)}
   function esc(e){if(e.key==='Escape')end(null)}document.addEventListener('keydown',esc);
   var ac=o.lastChild.lastChild;
-  ac.appendChild(btn('Crop and save',function(){var g=geom(),k=Math.min((ro.png?800:1600)/cw,1/g.sc),c=document.createElement('canvas');c.width=Math.round(cw*k);c.height=Math.round(ch*k);var x=c.getContext('2d');if(!ro.png){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,g.x*k,g.y*k,g.w*k,g.h*k);end(ro.png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.85))},'pri'));
+  ac.appendChild(btn('Crop and save',function(){var g=geom(),k=Math.min((ro.max||(png?(ro.png?800:1200):1600))/cw,1/g.sc),c=document.createElement('canvas');c.width=Math.round(cw*k);c.height=Math.round(ch*k);var x=c.getContext('2d');if(!png){x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height)}x.drawImage(im,g.x*k,g.y*k,g.w*k,g.h*k);end(png?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.85))},'pri'));
   ac.appendChild(btn('Use whole image',function(){(ro.png?lpic:pic)(file).then(end)}));
   ac.appendChild(btn(total>1?'Skip this image':'Cancel',function(){end(null)}));
   document.body.appendChild(o);draw()};im.src=rd.result};rd.readAsDataURL(file)})}
@@ -113,25 +114,30 @@ function items(o,k,fields,blank,label){
 var views={
  Site:function(m){
   var b=box('Site','Logo, your full name and footer text. The full name appears in the footer and About page.');
-  add(b,[sel(S.brand,'logoMode','Logo style',[['text','Name only'],['image','Uploaded logo only'],['both','Uploaded logo and name']]),fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page')]);
+  add(b,[sel(S.brand,'logoMode','Logo style',[['text','Name only'],['image','Uploaded logo only'],['both','Uploaded logo and name']]),fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page'),fld(S.brand,'center','Centre text in the header (leave empty to hide)')]);
   var lr=el('<div class="row"></div>');lr.appendChild(el('<label style="margin:0">Logo image</label>'));
   if(S.brand.logoImg)lr.appendChild(el('<img class="big" style="max-width:120px;background:#888;padding:6px;border-radius:8px" src="'+S.brand.logoImg+'" alt="">'));
   lr.appendChild(btn(S.brand.logoImg?'Replace logo':'Upload logo',function(){upload(0,function(r){S.brand.logoImg=r[0];if(!S.brand.logoMode||S.brand.logoMode==='text')S.brand.logoMode='image';save();draw()},null,{r:RL,d:0,png:1})}));
   if(S.brand.logoImg)lr.appendChild(btn('Remove logo',function(){S.brand.logoImg='';S.brand.logoMode='text';save();draw()},'del'));
-  b.appendChild(lr);b.appendChild(el('<p class="hint">PNG or SVG with a transparent background works best. Choose “Logo style” above to show the logo, the name, or both.</p>'));m.appendChild(b)},
+  b.appendChild(lr);b.appendChild(el('<p class="hint">PNG or SVG with a transparent background works best. Choose “Logo style” above to show the logo, the name, or both.</p>'));m.appendChild(b);
+  var fb=box('Favicon (browser tab icon)','A small square image shown in the browser tab. A simple logo or letter on a transparent or solid background works best.'),fr=el('<div class="row"></div>');
+  if(S.brand.favicon)fr.appendChild(el('<img style="width:48px;height:48px;object-fit:contain;background:#777;padding:4px;border-radius:8px" src="'+S.brand.favicon+'" alt="">'));
+  fr.appendChild(btn(S.brand.favicon?'Replace favicon':'Upload favicon',function(){upload(0,function(r){S.brand.favicon=r[0];save();draw()},null,{r:[['1:1',1]],d:1,png:1,max:192})}));
+  if(S.brand.favicon)fr.appendChild(btn('Remove favicon',function(){S.brand.favicon='';save();draw()},'del'));
+  fb.appendChild(fr);fb.appendChild(el('<p class="hint">Browsers can take a while to refresh tab icons after you publish. Reload the page or reopen the tab to see the new one.</p>'));m.appendChild(fb)},
  Home:function(m){
   var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
-  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text')]);m.appendChild(b);
+  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text'),sld(S.home,'boxOpacity','Headline box darkness',0,0.9,0.05,0.4,'The soft blurred panel behind the headline and intro so they are easy to read. 0 removes it.')]);m.appendChild(b);
   var fb=box('Projects featured on the Home page','Tick the projects to show on Home, as many or as few as you like. They appear in the same order as in the Projects tab.');
   S.projects.forEach(function(p){fb.appendChild(el('<div class="row"></div>')).appendChild(ck(p,'featured',(p.title||'Untitled')))});
   if(!S.projects.length)fb.appendChild(el('<p class="hint">No projects yet. Add one in the Projects tab.</p>'));
   m.appendChild(fb);
   var H=S.home;H.floats=H.floats||[];
-  var c=box('Floating cards in the hero','The images that drift beside the headline. Use up to 10 and show as many as you like. The crop tool starts at each card’s own shape. They are separate from your project covers.');
+  var c=box('Floating cards in the hero','The images that drift beside the headline. Use up to 10 and show as many as you like. Each card takes the shape of the image you upload, so crop it any way you like. They are separate from your project covers.');
   H.floats.forEach(function(f,i){
    var r=el('<div class="row"></div>');
    r.appendChild(f.img?el('<img class="big" style="max-width:120px" src="'+f.img+'" alt="">'):el('<span class="hint">No image yet (shows a colour block)</span>'));
-   r.appendChild(btn(f.img?'Replace image':'Add image',function(){upload(0,function(x){f.img=x[0];save();draw()},null,{r:RF,d:SL[i%10]})}));
+   r.appendChild(btn(f.img?'Replace image':'Add image',function(){upload(0,function(x){f.img=x[0];save();draw()},null,{r:RF,d:0})}));
    r.appendChild(btn('↑',function(){moveList(H.floats,i,-1)}));r.appendChild(btn('↓',function(){moveList(H.floats,i,1)}));
    r.appendChild(btn('Remove',function(){H.floats.splice(i,1);save();draw()},'del'));c.appendChild(r)});
   var sp=el('<div><label>Card movement speed: <b></b></label><input type="range" min="0" max="10" step="0.5"><p class="hint">0 keeps the cards still, 3 is the default, 10 is very fast. Use Preview site to see it.</p></div>'),rg=sp.querySelector('input'),vl=sp.querySelector('b');
@@ -194,7 +200,8 @@ var views={
   r.appendChild(btn('Discard my edits and go back to the live version',function(){if(confirm('Discard all unpublished edits in this browser?'))DB.del('draft').then(function(){S=JSON.parse(JSON.stringify(window.SITE));fix();draw()})},'del'));b.appendChild(r);m.appendChild(b)}
 };
 function fix(){S.brands=S.brands||{title:'Brands I’ve worked with',mono:false,items:[]};S.about=S.about||{};S.contact.socials=S.contact.socials||[]}
-function out(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});return 'window.SITE = '+JSON.stringify(D,null,1)+';\n'}
+function cu(u){u=(u||'').trim();return /^#.*[.\/:@]/.test(u)?u.slice(1):u}
+function out(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});D.contact.socials.forEach(function(k){k.u=cu(k.u)});((D.brands||{}).items||[]).forEach(function(k){k.url=cu(k.url)});return 'window.SITE = '+JSON.stringify(D,null,1)+';\n'}
 function dl(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out()],{type:'text/javascript'}));a.download='content.js';a.click()}
 function b64(str){var b=new TextEncoder().encode(str),s='';for(var i=0;i<b.length;i+=32768)s+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(s)}
 function gh(g,st){

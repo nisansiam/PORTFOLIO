@@ -28,7 +28,7 @@ function pic2(p,i){
  return ph(p)}
 function head(){
  var B=S.brand;
- return '<header class="wrap">'+logo()+'<div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
+ return '<header class="wrap">'+logo()+(B.center===''?'':'<span class="hc">'+e(B.center==null?'PORTFOLIO':B.center)+'</span>')+'<div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
  '<nav id="menu" aria-label="Main"><button class="x" id="close" aria-label="Close menu">×</button><a class="big" href="index.html">Home</a><a class="big" href="about.html">About</a><a class="big" href="work.html">Work</a><a class="big" href="contact.html">Contact</a><div class="soc">'+S.contact.socials.map(function(s){return '<a '+ext(s.u)+'>'+e(s.n)+'</a>'}).join('')+'</div></nav>';
 }
 function foot(){
@@ -40,7 +40,7 @@ function foot(){
 }
 function marquee(){return '<div class="mq" aria-hidden="true"><div id="m1">'+e(S.home.marquee)+'</div><div id="m2">'+e(S.home.marquee)+'</div></div>'}
 function featured(){return S.projects.filter(function(p){return p.featured})}
-function href(u){u=(u||'').trim();if(!u||u==='#')return '#';return /^(https?:|mailto:|tel:|#|\/|\.\.?\/)/i.test(u)?u:'https://'+u}
+function href(u){u=(u||'').trim();if(/^#.*[.\/:@]/.test(u))u=u.slice(1);if(!u||u==='#')return '#';return /^(https?:|mailto:|tel:|#|\/|\.\.?\/)/i.test(u)?u:'https://'+u}
 function ext(u){var h=href(u);return 'href="'+e(h)+'"'+(h.charAt(0)==='#'?'':' target="_blank" rel="noopener"')}
 function brandsSec(){var B=S.brands;if(!B||!B.items)return '';
  var its=B.items.filter(function(x){return x.img});if(!its.length)return '';
@@ -58,10 +58,11 @@ function aboutBlock(title,text,more){
  return '<div class="wrap abt'+(ph?'':' np')+'">'+ph+'<div><h2>'+e(title)+'</h2>'+String(text||'').split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+more+'</div></div>'}
 var views={
  home:function(){
-  var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){return '<div class="fl f'+(i+1)+bg({cover:q.img,color:'p'+(i%4+1)})+'" data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"></div>'}).join('');
-  return '<div class="hero wrap">'+fl+'<h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
-  '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a></div>')+'</section>'+
-  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+marquee();
+  var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){var d=' data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"';
+   return q.img?'<div class="fl f'+(i+1)+' has"'+d+'><img src="'+e(q.img)+'" alt=""></div>':'<div class="fl f'+(i+1)+' p'+(i%4+1)+'"'+d+'></div>'}).join('');
+  return '<div class="hero wrap">'+fl+'<div class="hbox" style="--bo:'+(H.boxOpacity==null?.4:H.boxOpacity)+'"><h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p></div><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
+  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+
+  '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a></div>')+'</section>'+marquee();
  },
  work:function(){
   return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,false,i)}).join('')+'</div></div></section>'+brandsSec()+
@@ -107,6 +108,7 @@ function wire(){
   dlg.addEventListener('close',function(){history.replaceState(null,'',location.pathname)});
   if(location.hash.length>1)show(decodeURIComponent(location.hash.slice(1)));
  }
+ [].forEach.call(document.querySelectorAll('.fl.has img'),function(im){var f=function(){if(im.naturalWidth)im.parentNode.style.setProperty('--r',im.naturalWidth/im.naturalHeight)};im.complete?f():im.addEventListener('load',f)});
  logoMq();
  var f=document.getElementById('f');
  if(f)f.onsubmit=function(ev){ev.preventDefault();var fs=document.getElementById('fs'),u=(S.contact.formUrl||'').trim();
@@ -122,6 +124,7 @@ DB.get('draft').then(function(d){
  if(d&&d.brand&&d.projects){S=d;drafted=true}else S=window.SITE;
  var titles={home:'Portfolio',work:'Work',about:'About',contact:'Contact'};
  document.title=titles[page]+' – '+S.brand.full+' ('+S.brand.name+')';
+ if(S.brand.favicon){var lk=document.querySelector('link[rel~=icon]');if(!lk){lk=document.createElement('link');lk.rel='icon';document.head.appendChild(lk)}lk.type='image/png';lk.href=S.brand.favicon}
  document.getElementById('app').innerHTML=head()+'<main>'+views[page]()+'</main>'+foot();
  wire();
  if(location.hash&&page!=='work'){var t=document.getElementById(location.hash.slice(1));if(t)t.scrollIntoView()}
