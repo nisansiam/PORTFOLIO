@@ -29,37 +29,44 @@ function pic2(p,i){
 function head(){
  var B=S.brand;
  return '<header class="wrap">'+logo()+'<div class="hr"><a class="pill hide" href="contact.html">Get in touch <i>↗</i></a><button class="burger" id="open" aria-label="Open menu" aria-expanded="false"><b></b><b></b></button></div></header>'+
- '<nav id="menu" aria-label="Main"><button class="x" id="close" aria-label="Close menu">×</button><a class="big" href="index.html">Home</a><a class="big" href="about.html">About</a><a class="big" href="work.html">Work</a><a class="big" href="contact.html">Contact</a><div class="soc">'+S.contact.socials.map(function(s){return '<a href="'+e(s.u)+'">'+e(s.n)+'</a>'}).join('')+'</div></nav>';
+ '<nav id="menu" aria-label="Main"><button class="x" id="close" aria-label="Close menu">×</button><a class="big" href="index.html">Home</a><a class="big" href="about.html">About</a><a class="big" href="work.html">Work</a><a class="big" href="contact.html">Contact</a><div class="soc">'+S.contact.socials.map(function(s){return '<a '+ext(s.u)+'>'+e(s.n)+'</a>'}).join('')+'</div></nav>';
 }
 function foot(){
  var B=S.brand,C=S.contact;
  return '<footer><div class="wrap"><div class="ft"><div>'+logo()+'<small>Based in</small><address>'+e(C.location)+'</address><small>Contact</small><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></div>'+
- '<div class="nav"><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="work.html">Work</a></li><li><a href="contact.html">Contact</a></li></ul><ul>'+C.socials.map(function(s){return '<li><a href="'+e(s.u)+'">'+e(s.n)+'</a></li>'}).join('')+'</ul></div></div>'+
+ '<div class="nav"><ul><li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="work.html">Work</a></li><li><a href="contact.html">Contact</a></li></ul><ul>'+C.socials.map(function(s){return '<li><a '+ext(s.u)+'>'+e(s.n)+'</a></li>'}).join('')+'</ul></div></div>'+
  '<div class="copy"><span>© '+new Date().getFullYear()+' '+e(B.full)+'. All rights reserved.</span><span class="dim">'+e(B.name)+' · Graphic design, '+e(C.location)+'</span></div>'+
  (page==='home'?'<div class="giant" aria-hidden="true">'+e(S.home.giant)+'</div>':'')+'</div></footer>';
 }
 function marquee(){return '<div class="mq" aria-hidden="true"><div id="m1">'+e(S.home.marquee)+'</div><div id="m2">'+e(S.home.marquee)+'</div></div>'}
 function featured(){return S.projects.filter(function(p){return p.featured})}
+function href(u){u=(u||'').trim();if(!u||u==='#')return '#';return /^(https?:|mailto:|tel:|#|\/|\.\.?\/)/i.test(u)?u:'https://'+u}
+function ext(u){var h=href(u);return 'href="'+e(h)+'"'+(h.charAt(0)==='#'?'':' target="_blank" rel="noopener"')}
+function brandsSec(){var B=S.brands;if(!B||!B.items||!B.items.length)return '';
+ return '<section class="brands"><div class="wrap center"><h2 class="sm">'+e(B.title)+'</h2><div class="lgrow'+(B.mono?' mono':'')+'">'+B.items.filter(function(x){return x.img}).map(function(x){var im='<img src="'+e(x.img)+'" alt="'+e(x.name)+'" loading="lazy">';return x.url?'<a '+ext(x.url)+' aria-label="'+e(x.name)+'">'+im+'</a>':'<span>'+im+'</span>'}).join('')+'</div></div></section>'}
+function aboutBlock(title,text,more){
+ var A=S.about,ph=A.photo?'<img class="me" src="'+e(A.photo)+'" alt="'+e(S.brand.full)+'">':'';
+ return '<div class="wrap abt'+(ph?'':' np')+'">'+ph+'<div><h2>'+e(title)+'</h2>'+String(text||'').split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+more+'</div></div>'}
 var views={
  home:function(){
   var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){return '<div class="fl f'+(i+1)+bg({cover:q.img,color:'p'+(i%4+1)})+'" data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"></div>'}).join('');
   return '<div class="hero wrap">'+fl+'<h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
-  '<section><div class="wrap two"><h2>'+e(H.teaserTitle)+'</h2><div><p>'+e(H.teaserText)+'</p><div class="btns" style="justify-content:flex-start;margin-top:28px"><a class="pill" href="about.html">More about me <i>↗</i></a></div></div></div></section>'+
-  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+marquee();
+  '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a></div>')+'</section>'+
+  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+marquee();
  },
  work:function(){
-  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,false,i)}).join('')+'</div></div></section>'+
+  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,false,i)}).join('')+'</div></div></section>'+brandsSec()+
   '<dialog id="dlg" aria-label="Project details"></dialog>';
  },
  about:function(){
   var A=S.about;
-  return '<section class="top"><div class="wrap"><div class="two"><h2>'+e(A.title)+'</h2><p>'+e(A.text)+'</p></div><div class="grid">'+A.skills.map(function(k){return '<div class="tile"><h3>'+e(k.t)+'</h3><p>'+e(k.d)+'</p></div>'}).join('')+'</div>'+
+  return '<section class="top">'+aboutBlock(A.title,A.text,'')+'<div class="wrap"><div class="grid">'+A.skills.map(function(k){return '<div class="tile"><h3>'+e(k.t)+'</h3><p>'+e(k.d)+'</p></div>'}).join('')+'</div>'+
   '<div class="tools">'+A.tools.split(',').map(function(t){return t.trim()?'<span class="tag">'+e(t.trim())+'</span>':''}).join('')+'</div><div class="btns" style="justify-content:flex-start;margin-top:48px"><a class="pill" href="contact.html">Work with me <i>↗</i></a></div></div></section>';
  },
  contact:function(){
   var C=S.contact;
   return '<section class="top"><div class="wrap contact"><div><h2>'+e(C.title)+'</h2><p class="dim" style="margin-top:20px">'+e(C.intro)+'</p><ul class="cl"><li><span>✉</span><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></li><li><span>☎</span>'+e(C.phone)+'</li><li><span>⌖</span>'+e(C.location)+'</li></ul></div>'+
-  '<form id="f"><label>First name<input name="fn" required autocomplete="given-name"></label><label>Last name<input name="ln" autocomplete="family-name"></label><label>Email<input name="em" type="email" required autocomplete="email"></label><label>Phone number<input name="ph" type="tel" autocomplete="tel"></label><label class="full">Message<textarea name="msg" required placeholder="Tell me about your project…"></textarea></label><button type="submit">Send message</button><div id="fs" role="status"></div></form></div></section>';
+  '<form id="f"><label>First name<input name="first_name" required autocomplete="given-name"></label><label>Last name<input name="last_name" autocomplete="family-name"></label><label>Email<input name="email" type="email" required autocomplete="email"></label><label>Phone number<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Message<textarea name="message" required placeholder="Tell me about your project…"></textarea></label><button type="submit">Send message</button><div id="fs" role="status"></div></form></div></section>';
  }
 };
 function wire(){
@@ -92,9 +99,12 @@ function wire(){
   if(location.hash.length>1)show(decodeURIComponent(location.hash.slice(1)));
  }
  var f=document.getElementById('f');
- if(f)f.onsubmit=function(ev){ev.preventDefault();var d=new FormData(f),b='From: '+d.get('fn')+' '+d.get('ln')+' ('+d.get('em')+', '+d.get('ph')+')\n\n'+d.get('msg');
+ if(f)f.onsubmit=function(ev){ev.preventDefault();var fs=document.getElementById('fs'),u=(S.contact.formUrl||'').trim();
+  if(u){fs.textContent='Sending…';
+   fetch(u,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}}).then(function(r){if(!r.ok)throw 0;f.reset();fs.textContent='Thank you! Your message has been sent.'}).catch(function(){fs.textContent='Sorry, the message could not be sent. Please email '+S.contact.email+' directly.'});return}
+  var d=new FormData(f),b='From: '+d.get('first_name')+' '+d.get('last_name')+' ('+d.get('email')+', '+d.get('phone')+')\n\n'+d.get('message');
   location.href='mailto:'+S.contact.email+'?subject='+encodeURIComponent('Portfolio enquiry')+'&body='+encodeURIComponent(b);
-  document.getElementById('fs').textContent='Opening your email app to send the message.'};
+  fs.textContent='Opening your email app to send the message.'};
  if(drafted){var b=document.createElement('div');b.id='pv';b.innerHTML='Previewing your unpublished edits <button id="pvx">Show live version</button>';document.body.appendChild(b);
   document.getElementById('pvx').onclick=function(){DB.del('draft').then(function(){location.reload()})}}
 }
