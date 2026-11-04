@@ -8,13 +8,14 @@ var DB=window.SiteDB={
 var page=document.body.dataset.page;
 if(!page)return;
 function e(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function rich(t){return e(t).replace(/\*([^*]+)\*/g,'<em class="sf">$1</em>')}
 var S,drafted=false,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 function bg(p){return p.cover?' img" style="background-image:url(&quot;'+e(p.cover)+'&quot;)':' '+e(p.color||'p1')}
 function ph(p,cls){return '<div class="'+(cls||'ph')+bg(p)+'">'+(p.cover?'':e(p.title))+'</div>'}
 function tags(a){return '<div class="tags">'+(a||[]).map(function(t){return '<span class="tag">'+e(t)+'</span>'}).join('')+'</div>'}
 function card(p,link,i){
- var inner=pic2(p,i||0)+'<h3>'+e(p.title)+'</h3><p>'+e(p.summary)+'</p>'+tags(p.tags);
- return link?'<a class="card" href="work.html#'+e(p.id)+'">'+inner+'</a>':'<button class="card" data-id="'+e(p.id)+'">'+inner+'</button>';
+ var n=String((i||0)+1);if(n.length<2)n='0'+n;
+ return '<a class="card" href="project.html?p='+encodeURIComponent(p.id)+'"><div class="imw">'+pic2(p,i||0)+'</div><div class="cr"><h3>'+e(p.title)+'</h3><span class="num">'+n+'</span></div><p>'+e(p.summary)+'</p>'+tags(p.tags)+'</a>';
 }
 function logo(){var B=S.brand,m=B.logoMode||'text',h='';
  if((m==='image'||m==='both')&&B.logoImg)h+='<img class="lg" src="'+e(B.logoImg)+'" alt="'+e(B.name)+'">';
@@ -38,14 +39,13 @@ function foot(){
  '<div class="copy"><span>© '+new Date().getFullYear()+' '+e(B.full)+'. All rights reserved.</span><span class="dim">'+e(B.name)+' · Graphic design, '+e(C.location)+'</span></div>'+
  (page==='home'?'<div class="giant" aria-hidden="true">'+e(S.home.giant)+'</div>':'')+'</div></footer>';
 }
-function symCta(){return '<section class="sym-sec"><div class="wrap"><a class="symbiote-cta" data-symbiote href="contact.html">LET’S WORK TOGETHER</a></div></section>'}
 function marquee(){return '<div class="mq" aria-hidden="true"><div id="m1">'+e(S.home.marquee)+'</div><div id="m2">'+e(S.home.marquee)+'</div></div>'}
 function featured(){return S.projects.filter(function(p){return p.featured})}
 function href(u){u=(u||'').trim();if(/^#.*[.\/:@]/.test(u))u=u.slice(1);if(!u||u==='#')return '#';return /^(https?:|mailto:|tel:|#|\/|\.\.?\/)/i.test(u)?u:'https://'+u}
 function ext(u){var h=href(u);return 'href="'+e(h)+'"'+(h.charAt(0)==='#'?'':' target="_blank" rel="noopener"')}
 function brandsSec(){var B=S.brands;if(!B||!B.items)return '';
  var its=B.items.filter(function(x){return x.img});if(!its.length)return '';
- return '<section class="brands"><div class="wrap center"><h2 class="sm">'+e(B.title)+'</h2></div><div class="mqr'+(B.mono?' mono':'')+'" style="--lh:'+(B.size||64)+'px"><div class="mtrack">'+its.map(function(x){var im='<img src="'+e(x.img)+'" alt="'+e(x.name)+'">';return x.url?'<a '+ext(x.url)+' aria-label="'+e(x.name)+'">'+im+'</a>':'<span>'+im+'</span>'}).join('')+'</div></div></section>'}
+ return '<section class="brands"><div class="wrap center"><h2 class="sm">'+rich(B.title)+'</h2></div><div class="mqr'+(B.mono?' mono':'')+'" style="--lh:'+(B.size||64)+'px"><div class="mtrack">'+its.map(function(x){var im='<img src="'+e(x.img)+'" alt="'+e(x.name)+'">';return x.url?'<a '+ext(x.url)+' aria-label="'+e(x.name)+'">'+im+'</a>':'<span>'+im+'</span>'}).join('')+'</div></div></section>'}
 function logoMq(){
  var tr=document.querySelector('.mtrack');if(!tr)return;
  var sp=S.brands.speed==null?3:+S.brands.speed,items=[].slice.call(tr.children),per=Math.max(1,Math.ceil(16/items.length));
@@ -56,18 +56,18 @@ function logoMq(){
 }
 function aboutBlock(title,text,more){
  var A=S.about,ph=A.photo?'<img class="me" src="'+e(A.photo)+'" alt="'+e(S.brand.full)+'">':'';
- return '<div class="wrap abt'+(ph?'':' np')+'">'+ph+'<div><h2>'+e(title)+'</h2>'+String(text||'').split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+more+'</div></div>'}
+ return '<div class="wrap abt'+(ph?'':' np')+'">'+ph+'<div><h2>'+rich(title)+'</h2>'+String(text||'').split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+more+'</div></div>'}
 var views={
  home:function(){
   var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){var d=' data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"';
    return q.img?'<div class="fl f'+(i+1)+' has"'+d+'><img src="'+e(q.img)+'" alt=""></div>':'<div class="fl f'+(i+1)+' p'+(i%4+1)+'"'+d+'></div>'}).join('');
-  return '<div class="hero wrap'+((H.heroMode||'3d')==='3d'?' d3':'')+'"><div class="stage">'+fl+'</div><div class="hbox" style="--bo:'+(H.boxOpacity==null?.4:H.boxOpacity)+'"><h1>'+e(H.h1a)+'<br><em>'+e(H.h1b)+'</em></h1><p>'+e(H.intro)+'</p></div><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
-  '<section><div class="wrap"><div class="center"><h2>'+e(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+
-  '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a></div>')+'</section>'+symCta()+marquee();
+  return '<div class="hero wrap'+((H.heroMode||'3d')==='3d'?' d3':'')+'"><div class="stage">'+fl+'</div><div class="hbox" style="--bo:'+(H.boxOpacity==null?.4:H.boxOpacity)+'">'+(H.avail?'<div class="av"><i></i>'+e(H.avail)+'</div>':'')+'<h1>'+rich(H.h1a)+'<br><span class="mu">'+rich(H.h1b)+'</span></h1><p>'+e(H.intro)+'</p></div><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
+  '<section><div class="wrap"><div class="center"><h2>'+rich(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+
+  '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a></div>')+'</section>'+marquee();
  },
  work:function(){
-  return '<section class="top"><div class="wrap"><div class="center"><h2>Work</h2><p>Every project. Select one to see details and more images.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,false,i)}).join('')+'</div></div></section>'+brandsSec()+
-  '<dialog id="dlg" aria-label="Project details"></dialog>';
+  if(location.hash.length>1)location.replace('project.html?p='+encodeURIComponent(decodeURIComponent(location.hash.slice(1))));
+  return '<section class="top"><div class="wrap"><div class="center"><h2>Selected <em class="sf">work</em></h2><p>Every project. Select one to read the full case study.</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+S.projects.map(function(p,i){return card(p,true,i)}).join('')+'</div></div></section>'+brandsSec();
  },
  about:function(){
   var A=S.about;
@@ -78,6 +78,19 @@ var views={
   var C=S.contact;
   return '<section class="top"><div class="wrap contact"><div><h2>'+e(C.title)+'</h2><p class="dim" style="margin-top:20px">'+e(C.intro)+'</p><ul class="cl"><li><span>✉</span><a href="mailto:'+e(C.email)+'">'+e(C.email)+'</a></li><li><span>☎</span>'+e(C.phone)+'</li><li><span>⌖</span>'+e(C.location)+'</li></ul></div>'+
   '<form id="f"><label>First name<input name="first_name" required autocomplete="given-name"></label><label>Last name<input name="last_name" autocomplete="family-name"></label><label>Email<input name="email" type="email" required autocomplete="email"></label><label>Phone number<input name="phone" type="tel" autocomplete="tel"></label><label class="full">Message<textarea name="message" required placeholder="Tell me about your project…"></textarea></label><button type="submit">Send message</button><div id="fs" role="status"></div></form></div></section>';
+ },
+ project:function(){
+  var id=new URLSearchParams(location.search).get('p'),P=S.projects,i=-1,k;
+  for(k=0;k<P.length;k++)if(P[k].id===id)i=k;
+  if(i<0)return '<section class="top"><div class="wrap center"><h2>Project not found</h2><p><a class="pill" href="work.html" style="margin-top:24px">Back to work <i>↗</i></a></p></div></section>';
+  var p=P[i],nx=P[(i+1)%P.length];
+  document.title=p.title+' – '+S.brand.full+' ('+S.brand.name+')';
+  var meta=[['Client',p.client],['Date',p.date],['Role',p.role]].filter(function(m){return m[1]}).map(function(m){return '<div><dt>'+m[0]+'</dt><dd>'+e(m[1])+'</dd></div>'}).join('');
+  var secs=[['Overview',p.desc],['The brief',p.brief],['The process',p.process],['The result',p.result]].filter(function(x){return x[1]&&String(x[1]).trim()}).map(function(x,n){return '<div class="cs"><div class="csl"><span class="num">0'+(n+1)+'</span>'+x[0]+'</div><div class="cst">'+String(x[1]).split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+'</div></div>'}).join('');
+  var gal=(p.images||[]).map(function(x){return '<img class="gi" src="'+e(x)+'" alt="'+e(p.title)+'" loading="lazy" decoding="async">'}).join('');
+  return '<section class="top pj"><div class="wrap"><a class="back" href="work.html">← All work</a><h1 class="pt">'+rich(p.title)+'</h1><p class="ps">'+e(p.summary)+'</p>'+tags(p.tags)+(meta?'<dl class="meta">'+meta+'</dl>':'')+
+   '<div class="pcov">'+(p.cover?'<img class="gi" src="'+e(p.cover)+'" alt="'+e(p.title)+'">':ph(p))+'</div>'+secs+(gal?'<div class="gals">'+gal+'</div>':'')+
+   (P.length>1?'<a class="next" href="project.html?p='+encodeURIComponent(nx.id)+'"><span class="dim">Next project</span><span class="nt">'+e(nx.title)+' <i>↗</i></span></a>':'')+'</div></section>';
  }
 };
 function wire(){
@@ -109,22 +122,19 @@ function wire(){
     requestAnimationFrame(frame)}
   }
  }
- if(page==='work'){
-  var dlg=document.getElementById('dlg');
-  var show=function(id){
-   var p=S.projects.filter(function(x){return x.id===id})[0];if(!p)return;
-   var imgs=(p.images||[]).map(function(s){return '<img src="'+e(s)+'" alt="'+e(p.title)+'" loading="lazy">'}).join('');
-   dlg.innerHTML='<div class="bar"><button class="pill" id="dx" style="padding:8px 18px">Close</button></div>'+(p.cover?'<img class="nat" style="border-radius:0;margin:0;max-height:70vh;object-fit:contain;background:#000" src="'+e(p.cover)+'" alt="'+e(p.title)+'">':ph(p))+
-   '<div class="body"><div><h3>'+e(p.title)+'</h3><p class="desc">'+e(p.desc)+'</p>'+tags(p.tags)+'</div><dl><div><dt>Client</dt><dd>'+e(p.client||'—')+'</dd></div><div><dt>Date</dt><dd>'+e(p.date||'—')+'</dd></div><div><dt>Role</dt><dd>'+e(p.role||'—')+'</dd></div></dl></div>'+(imgs?'<div class="gal">'+imgs+'</div>':'');
-   var q=dlg.querySelector('.ph');if(q)q.style.margin='0';
-   document.getElementById('dx').onclick=function(){dlg.close()};
-   dlg.querySelectorAll('.gal img').forEach(function(im){im.onclick=function(){window.open(im.src,'_blank')}});
-   if(!dlg.open)dlg.showModal();dlg.scrollTop=0;history.replaceState(null,'','#'+id);
-  };
-  document.querySelectorAll('.card').forEach(function(c){c.onclick=function(){show(c.dataset.id)}});
-  dlg.addEventListener('click',function(ev){if(ev.target===dlg)dlg.close()});
-  dlg.addEventListener('close',function(){history.replaceState(null,'',location.pathname)});
-  if(location.hash.length>1)show(decodeURIComponent(location.hash.slice(1)));
+ var pg=document.createElement('div');pg.id='pg';document.body.appendChild(pg);
+ addEventListener('scroll',function(){var h=document.documentElement.scrollHeight-innerHeight;pg.style.width=(h>0?scrollY/h*100:0)+'%'},{passive:true});
+ if(!reduce&&'IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}})},{threshold:.1,rootMargin:'0px 0px -5% 0px'});
+  [].forEach.call(document.querySelectorAll('.center>*,.abt>*,.card,.tile,.tools,.contact>*,.ft>*,.copy,.cs,.gi,.next,.back,.pt,.ps,.meta,.mqr'),function(el){el.classList.add('rv');el.style.transitionDelay=([].indexOf.call(el.parentNode.children,el)%4*80)+'ms';io.observe(el)});
+ }
+ if(!reduce&&matchMedia('(hover:hover) and (pointer:fine)').matches){
+  var cu=document.createElement('div'),mx=0,my=0,px=0,py=0;cu.id='cur';cu.innerHTML='<span>View</span>';document.body.appendChild(cu);document.body.classList.add('hascur');
+  addEventListener('mousemove',function(ev){mx=ev.clientX;my=ev.clientY;cu.classList.add('vis')});
+  document.addEventListener('mouseover',function(ev){cu.classList.toggle('on',!!(ev.target.closest&&ev.target.closest('.card')))});
+  document.documentElement.addEventListener('mouseleave',function(){cu.classList.remove('vis')});
+  (function mv(){px+=(mx-px)*.2;py+=(my-py)*.2;cu.style.transform='translate3d('+px+'px,'+py+'px,0) translate(-50%,-50%)';requestAnimationFrame(mv)})();
+  [].forEach.call(document.querySelectorAll('.pill'),function(b){b.addEventListener('mousemove',function(ev){var r=b.getBoundingClientRect();b.style.transform='translate('+((ev.clientX-r.left-r.width/2)*.18)+'px,'+((ev.clientY-r.top-r.height/2)*.28)+'px)'});b.addEventListener('mouseleave',function(){b.style.transform=''})});
  }
  [].forEach.call(document.querySelectorAll('.fl.has img'),function(im){var f=function(){if(im.naturalWidth)im.parentNode.style.setProperty('--r',im.naturalWidth/im.naturalHeight)};im.complete?f():im.addEventListener('load',f)});
  logoMq();
@@ -140,7 +150,8 @@ function wire(){
 }
 DB.get('draft').then(function(d){
  if(d&&d.brand&&d.projects){S=d;drafted=true}else S=window.SITE;
- var titles={home:'Portfolio',work:'Work',about:'About',contact:'Contact'};
+ var titles={home:'Portfolio',work:'Work',about:'About',contact:'Contact',project:'Project'};
+ document.documentElement.style.setProperty('--ac',S.brand.accent||'#e8643c');
  document.title=titles[page]+' – '+S.brand.full+' ('+S.brand.name+')';
  if(S.brand.favicon){var lk=document.querySelector('link[rel~=icon]');if(!lk){lk=document.createElement('link');lk.rel='icon';document.head.appendChild(lk)}lk.type='image/png';lk.href=S.brand.favicon}
  document.getElementById('app').innerHTML=head()+'<main>'+views[page]()+'</main>'+foot();

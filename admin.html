@@ -25,6 +25,7 @@ label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
 label.ck{display:flex;gap:10px;align-items:center}
 input[type=text],input:not([type]),textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
 select{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+input[type=color]{width:64px;height:40px;padding:2px}
 textarea{min-height:100px;resize:vertical}
 .cm{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:grid;place-items:start center;padding:16px;overflow:auto}
 .cb{background:var(--card);color:var(--fg);border-radius:12px;padding:18px;max-width:640px;width:100%;margin:auto}
@@ -68,6 +69,7 @@ function trim(url){return new Promise(function(ok){var im=new Image();im.onerror
  if(x1<0||(x1-x0+1>=W-1&&y1-y0+1>=H-1)){ok(url);return}
  var w=x1-x0+1,h=y1-y0+1,o=document.createElement('canvas');o.width=w;o.height=h;o.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);ok(o.toDataURL('image/png'))};im.src=url})}
 function hasA(im){var s=Math.min(1,200/Math.max(im.naturalWidth||im.width,im.naturalHeight||im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round((im.naturalWidth||im.width)*s));c.height=Math.max(1,Math.round((im.naturalHeight||im.height)*s));var g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);var d=g.getImageData(0,0,c.width,c.height).data;for(var i=3;i<d.length;i+=4)if(d[i]<250)return true;return false}
+function clr(o,k,label,def){var w=el('<div><label>'+label+'</label><input type="color"></div>'),i=w.querySelector('input');i.value=o[k]||def;i.oninput=function(){o[k]=i.value;save()};return w}
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
@@ -114,7 +116,7 @@ function items(o,k,fields,blank,label){
 var views={
  Site:function(m){
   var b=box('Site','Logo, your full name and footer text. The full name appears in the footer and About page.');
-  add(b,[sel(S.brand,'logoMode','Logo style',[['text','Name only'],['image','Uploaded logo only'],['both','Uploaded logo and name']]),fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page'),fld(S.brand,'center','Centre text in the header (leave empty to hide)')]);
+  add(b,[sel(S.brand,'logoMode','Logo style',[['text','Name only'],['image','Uploaded logo only'],['both','Uploaded logo and name']]),fld(S.brand,'name','Logo word (e.g. SIAM)'),fld(S.brand,'tag','Outlined logo word (e.g. DESIGN)'),fld(S.brand,'full','Full name'),fld(S.home,'giant','Big footer word on the Home page'),fld(S.home,'marquee','Scrolling headline on the Home page'),fld(S.brand,'center','Centre text in the header (leave empty to hide)'),clr(S.brand,'accent','Accent colour (hover effects, numbers and highlights)','#e8643c')]);
   var lr=el('<div class="row"></div>');lr.appendChild(el('<label style="margin:0">Logo image</label>'));
   if(S.brand.logoImg)lr.appendChild(el('<img class="big" style="max-width:120px;background:#888;padding:6px;border-radius:8px" src="'+S.brand.logoImg+'" alt="">'));
   lr.appendChild(btn(S.brand.logoImg?'Replace logo':'Upload logo',function(){upload(0,function(r){S.brand.logoImg=r[0];if(!S.brand.logoMode||S.brand.logoMode==='text')S.brand.logoMode='image';save();draw()},null,{r:RL,d:0,png:1})}));
@@ -126,8 +128,8 @@ var views={
   if(S.brand.favicon)fr.appendChild(btn('Remove favicon',function(){S.brand.favicon='';save();draw()},'del'));
   fb.appendChild(fr);fb.appendChild(el('<p class="hint">Browsers can take a while to refresh tab icons after you publish. Reload the page or reopen the tab to see the new one.</p>'));m.appendChild(fb)},
  Home:function(m){
-  var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Choose featured projects in the Projects tab.');
-  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text'),sld(S.home,'boxOpacity','Headline box darkness',0,0.9,0.05,0.4,'The soft blurred panel behind the headline and intro so they are easy to read. 0 removes it.'),sel(S.home,'heroMode','Hero style',[['3d','3D: cards float in space and tilt toward the mouse'],['flat','Flat: cards only drift as you scroll']]),sld(S.home,'tilt','3D tilt strength (degrees)',0,25,1,10,'How far the whole scene turns when you move the mouse. 0 keeps it still.'),sld(S.home,'depth','3D depth spread (px)',0,300,10,140,'How far apart the cards sit in depth. Bigger gives a stronger 3D feel.')]);m.appendChild(b);
+  var b=box('Home page','Headline, intro, short about teaser and the featured work heading. Put *asterisks* around a word in any heading to show it in an elegant italic serif, for example Design that gives *brands* a voice. Choose featured projects in the Projects tab.');
+  add(b,[fld(S.home,'h1a','Headline, first line'),fld(S.home,'h1b','Headline, second line (grey)'),fld(S.home,'intro','Intro under the headline',1),fld(S.home,'teaserTitle','About teaser title'),fld(S.home,'teaserText','About teaser text',1),fld(S.home,'featTitle','Featured work title'),fld(S.home,'featText','Featured work text'),fld(S.home,'avail','Availability note above the headline (leave empty to hide)'),sld(S.home,'boxOpacity','Headline box darkness',0,0.9,0.05,0.4,'The soft blurred panel behind the headline and intro so they are easy to read. 0 removes it.'),sel(S.home,'heroMode','Hero style',[['3d','3D: cards float in space and tilt toward the mouse'],['flat','Flat: cards only drift as you scroll']]),sld(S.home,'tilt','3D tilt strength (degrees)',0,25,1,10,'How far the whole scene turns when you move the mouse. 0 keeps it still.'),sld(S.home,'depth','3D depth spread (px)',0,300,10,140,'How far apart the cards sit in depth. Bigger gives a stronger 3D feel.')]);m.appendChild(b);
   var fb=box('Projects featured on the Home page','Tick the projects to show on Home, as many or as few as you like. They appear in the same order as in the Projects tab.');
   S.projects.forEach(function(p){fb.appendChild(el('<div class="row"></div>')).appendChild(ck(p,'featured',(p.title||'Untitled')))});
   if(!S.projects.length)fb.appendChild(el('<p class="hint">No projects yet. Add one in the Projects tab.</p>'));
@@ -176,7 +178,7 @@ var views={
   S.projects.forEach(function(p,i){
    var d=el('<details><summary><img alt="" src="'+(p.cover||'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')+'"><span>'+(p.title||'Untitled')+'</span></summary><div class="inner"></div></details>'),n=d.lastChild;
    if(p._open)d.open=true;d.ontoggle=function(){p._open=d.open};
-   add(n,[fld(p,'title','Title'),fld(p,'summary','Short line (shown on cards)'),fld(p,'desc','Full description',1),lst(p,'tags','Tags (separate with commas)'),el('<div class="two"></div>')]);
+   add(n,[fld(p,'title','Title'),fld(p,'summary','Short line (shown on cards)'),fld(p,'desc','Overview (full description)',1),fld(p,'brief','The brief (optional)',1),fld(p,'process','The process (optional)',1),fld(p,'result','The result (optional)',1),lst(p,'tags','Tags (separate with commas)'),el('<div class="two"></div>')]);
    var g=n.lastChild;add(g,[fld(p,'client','Client'),fld(p,'date','Date'),fld(p,'role','Your role')]);
    n.appendChild(ck(p,'featured','Show on Home page (featured)'));
    n.appendChild(el('<h3>Cover image</h3>'));
@@ -201,22 +203,32 @@ var views={
 };
 function fix(){S.brands=S.brands||{title:'Brands I’ve worked with',mono:false,items:[]};S.about=S.about||{};S.contact.socials=S.contact.socials||[]}
 function cu(u){u=(u||'').trim();return /^#.*[.\/:@]/.test(u)?u.slice(1):u}
-function out(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});D.contact.socials.forEach(function(k){k.u=cu(k.u)});((D.brands||{}).items||[]).forEach(function(k){k.url=cu(k.url)});return 'window.SITE = '+JSON.stringify(D,null,1)+';\n'}
+function clean(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});D.contact.socials.forEach(function(k){k.u=cu(k.u)});((D.brands||{}).items||[]).forEach(function(k){k.url=cu(k.url)});return D}
+function out(){return 'window.SITE = '+JSON.stringify(clean(),null,1)+';\n'}
 function dl(){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out()],{type:'text/javascript'}));a.download='content.js';a.click()}
 function b64(str){var b=new TextEncoder().encode(str),s='';for(var i=0;i<b.length;i+=32768)s+=String.fromCharCode.apply(null,b.subarray(i,i+32768));return btoa(s)}
+function h53(s){var a=0xdeadbeef,b=0x41c6ce57,c,i;for(i=0;i<s.length;i++){c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return (4294967296*(2097151&b)+(a>>>0)).toString(36)}
+function walk(o,fn){if(Array.isArray(o)){o.forEach(function(v,i){if(typeof v==='string')o[i]=fn(v);else walk(v,fn)})}else if(o&&typeof o==='object'){Object.keys(o).forEach(function(k){var v=o[k];if(typeof v==='string')o[k]=fn(v);else walk(v,fn)})}}
 function gh(g,st){
- var url='https://api.github.com/repos/'+encodeURIComponent(g.owner.trim())+'/'+encodeURIComponent(g.repo.trim())+'/contents/content.js',br=(g.branch||'main').trim(),
- hd={'Authorization':'Bearer '+g.token.trim(),'Accept':'application/vnd.github+json'};
+ var root='https://api.github.com/repos/'+encodeURIComponent(g.owner.trim())+'/'+encodeURIComponent(g.repo.trim())+'/contents/',br=(g.branch||'main').trim(),
+ hd={'Authorization':'Bearer '+g.token.trim(),'Accept':'application/vnd.github+json'},jh=Object.assign({'Content-Type':'application/json'},hd),D=clean(),map={},list=[];
+ function bad(r){var e=new Error('');e.status=r.status;return r.json().then(function(x){e.message=x.message||'';throw e},function(){throw e})}
+ walk(D,function(v){var m=/^data:image\/(png|jpeg);base64,/.exec(v);if(m&&!map[v]){map[v]='images/'+h53(v)+'-'+v.length.toString(36)+'.'+(m[1]==='png'?'png':'jpg');list.push(v)}return v});
+ walk(D,function(v){return map[v]||v});
  st('Checking the repository…');
- return fetch(url+'?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return null;if(!r.ok){var e=new Error('');e.status=r.status;throw e}return r.json()}).then(function(j){
-  st('Uploading your edits…');var o={message:'Update site content from admin panel',content:b64(out()),branch:br};if(j&&j.sha)o.sha=j.sha;
-  return fetch(url,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},hd),body:JSON.stringify(o)})}).then(function(r){
-  if(r.ok){st('Published. The live site updates in a minute or two.');return}
-  return r.json().then(function(x){var e=new Error(x.message||'');e.status=r.status;throw e})})}
+ return fetch(root+'images?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return [];if(!r.ok)return bad(r);return r.json()}).then(function(ex){
+  var have={};(Array.isArray(ex)?ex:[]).forEach(function(f){have['images/'+f.name]=1});
+  var todo=list.filter(function(v){return !have[map[v]]}),ch=Promise.resolve();
+  todo.forEach(function(v,n){ch=ch.then(function(){st('Uploading image '+(n+1)+' of '+todo.length+'…');return fetch(root+map[v],{method:'PUT',headers:jh,body:JSON.stringify({message:'Add image',content:v.split(',')[1],branch:br})}).then(function(r){if(!r.ok&&r.status!==422)return bad(r)})})});
+  return ch}).then(function(){
+  st('Uploading your edits…');
+  return fetch(root+'content.js?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return null;if(!r.ok)return bad(r);return r.json()})}).then(function(j){
+  var o={message:'Update site content from admin panel',content:b64('window.SITE = '+JSON.stringify(D,null,1)+';\n'),branch:br};if(j&&j.sha)o.sha=j.sha;
+  return fetch(root+'content.js',{method:'PUT',headers:jh,body:JSON.stringify(o)})}).then(function(r){if(r.ok){st('Published. The live site updates in a minute or two.');return}return bad(r)})}
 function direct(m){
  var w=document.createElement('div');m.appendChild(w);
  DB.get('gh').then(function(g){g=g||{owner:'',repo:'',branch:'main',token:''};
-  var b=box('Publish directly','Set this up once. After that, one click puts your edits live with no download or upload.'),f=el('<div class="two"></div>');
+  var b=box('Publish directly','Set this up once. After that, one click puts your edits live with no download or upload. It also saves your images as separate files in an images folder, which makes the site load faster than the download method.'),f=el('<div class="two"></div>');
   add(f,[fld(g,'owner','GitHub username'),fld(g,'repo','Repository name'),fld(g,'branch','Branch (usually main)')]);
   var t=el('<div><label>Access token</label><input type="password" autocomplete="off"></div>'),ti=t.lastChild;ti.value=g.token||'';ti.oninput=function(){g.token=ti.value};f.appendChild(t);b.appendChild(f);
   var s=el('<p class="hint" role="status"></p>'),st=function(x){s.textContent=x},r=el('<div class="row"></div>');

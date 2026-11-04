@@ -1,4 +1,4 @@
-:root{--bg:#141414;--bg2:#222;--fg:#fff;--mute:#7a7a7a;--line:#2e2e2e;--pill:#fff;--pillfg:#141414;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--ac:#e8643c;--bg:#141414;--bg2:#222;--fg:#fff;--mute:#7a7a7a;--line:#2e2e2e;--pill:#fff;--pillfg:#141414;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 
 html{scroll-padding-top:100px;scroll-behavior:smooth}
 *{box-sizing:border-box;margin:0}
@@ -25,8 +25,8 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:va
 #menu .x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 24px);right:clamp(20px,6vw,96px);background:none;border:1px solid var(--line);color:var(--fg);width:44px;height:44px;font-size:24px;cursor:pointer}
 #menu .soc{display:flex;gap:22px;margin-top:20px;font-size:15px;flex-wrap:wrap;justify-content:center}
 .hero{min-height:max(calc(100svh - 84px),54vw);position:relative;overflow:hidden;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 0 120px}
-.hero h1{font-size:clamp(46px,10.5vw,170px);position:relative;z-index:2;pointer-events:none}
-.hero h1 em{font-style:normal;color:var(--mute)}
+.hero h1{font-size:clamp(42px,8.6vw,132px);position:relative;z-index:2;pointer-events:none}
+.hero h1 .mu{color:var(--mute)}
 .hero p{position:relative;z-index:3;font-size:clamp(18px,2vw,26px);margin:30px 0 28px;max-width:30ch}
 .btns{position:relative;z-index:3;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 .fl{position:absolute;border-radius:12px;z-index:1;display:flex;align-items:flex-end;padding:14px;font:400 clamp(18px,2.4vw,34px)/1 Anton,Impact,sans-serif;text-transform:uppercase;will-change:transform;overflow:hidden;color:#fff}
@@ -133,3 +133,46 @@ h2.sm{font-size:clamp(24px,3vw,40px)}
 .hero.d3{perspective:1400px;perspective-origin:50% 45%}
 .hero.d3 .stage{transform-style:preserve-3d}
 .fl{box-shadow:0 26px 60px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.07);backface-visibility:hidden}
+
+::selection{background:var(--ac);color:#fff}
+.sf{font-family:'Instrument Serif',Georgia,'Times New Roman',serif;font-style:italic;font-weight:400;text-transform:none;letter-spacing:-.01em}
+.imw{overflow:hidden;border-radius:10px;margin-bottom:26px}
+.imw>*{margin:0!important;border-radius:0!important;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
+.card:hover .imw>*{transform:scale(1.06)}
+.cr{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.card h3{transition:color .3s}.card:hover h3{color:var(--ac)}
+.num{font:600 14px/1 Manrope,sans-serif;color:var(--ac);letter-spacing:.1em}
+.tile{transition:border-color .3s,transform .3s}.tile:hover{border-color:var(--ac)}
+.pill{transition:transform .25s ease,background .2s}
+.av{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;letter-spacing:.04em;margin-bottom:18px;color:#d6d6d6}
+.av i{width:9px;height:9px;border-radius:50%;background:#3ddc84;animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,220,132,.6)}70%{box-shadow:0 0 0 10px rgba(61,220,132,0)}100%{box-shadow:0 0 0 0 rgba(61,220,132,0)}}
+@keyframes rise{from{opacity:0;transform:translateY(34px)}}
+@keyframes fadein{from{opacity:0}}
+.hbox>*{animation:rise 1s cubic-bezier(.2,.7,.2,1) both}.hbox>*:nth-child(2){animation-delay:.08s}.hbox>*:nth-child(3){animation-delay:.16s}
+.hero .btns{animation:rise 1s .35s cubic-bezier(.2,.7,.2,1) both}
+.fl{animation:fadein 1.4s .2s both}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+body::after{content:"";position:fixed;inset:0;z-index:55;pointer-events:none;opacity:.07;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+#pg{position:fixed;top:0;left:0;height:2px;width:0;background:var(--ac);z-index:90}
+#cur{position:fixed;left:0;top:0;width:0;height:0;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;z-index:95;pointer-events:none;opacity:0;transition:width .25s,height .25s,opacity .2s;font:600 14px Manrope,sans-serif}
+#cur.vis{opacity:1}#cur.on{width:92px;height:92px}#cur span{opacity:0;transition:opacity .2s}#cur.on span{opacity:1}
+.hascur .card{cursor:none}
+.pt{font-size:clamp(40px,7vw,112px);font-weight:500;text-transform:uppercase;letter-spacing:-.03em;line-height:.98;margin-top:28px}
+.ps{color:var(--mute);font-size:clamp(18px,1.8vw,24px);max-width:48ch;margin:22px 0 20px}
+.back{color:var(--mute);text-decoration:none}.back:hover{color:var(--fg)}
+.meta{display:flex;gap:clamp(24px,5vw,72px);flex-wrap:wrap;margin-top:32px}
+.meta dt{font-weight:700}.meta dd{margin:0;color:var(--mute)}
+.pcov{margin:clamp(36px,5vw,72px) 0}
+.pcov .ph{aspect-ratio:16/9;margin:0;border-radius:12px}
+.gi{width:100%;height:auto;display:block;border-radius:12px}
+.cs{display:grid;grid-template-columns:1fr 2fr;gap:clamp(20px,5vw,80px);padding:clamp(28px,4vw,56px) 0;border-top:1px solid var(--line)}
+.csl{font:600 15px Manrope,sans-serif;text-transform:uppercase;letter-spacing:.12em;display:flex;gap:14px;align-items:baseline}
+.cst p{font-size:clamp(17px,1.5vw,21px);color:#bcbcbc}.cst p+p{margin-top:16px}
+.gals{display:grid;gap:clamp(16px,2vw,28px);margin-top:clamp(28px,4vw,56px)}
+.next{display:block;margin-top:clamp(64px,9vw,140px);padding-top:clamp(28px,4vw,56px);border-top:1px solid var(--line);text-decoration:none}
+.next .nt{display:block;font-size:clamp(34px,6vw,96px);font-weight:500;text-transform:uppercase;letter-spacing:-.03em;line-height:1;margin-top:12px;transition:color .3s}
+.next:hover .nt{color:var(--ac)}.next i{font-style:normal}
+@media (max-width:860px){.cs{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.hbox>*,.hero .btns,.fl{animation:none}}
