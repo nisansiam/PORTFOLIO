@@ -14,3 +14,11 @@ NEW IN THIS VERSION
   Replace it with your own 1200 x 630 image by uploading a file with the same name.
   If your GitHub address is not nisansiam.github.io/portfolio, open each .html file and change the address in the og:image, twitter:image and og:url lines.
 - Use "Publish now" in the admin panel: it saves your images as separate files in an images folder, so the site loads faster.
+
+SYMBIOTE CTA BUTTON
+- Upload symbiote-cta.js and symbiote-cta.css too (index.html uses them). Distances, timing and text are now editable in the admin panel: Effects tab.
+
+SERVICES, CV, WHATSAPP
+- Services section (Home): admin > Services.
+- CV download and WhatsApp button: admin > Contact. WhatsApp number with country code, for example 8801XXXXXXXXX.
+- With "Publish now", a CV PDF is saved in a files folder and images in an images folder.

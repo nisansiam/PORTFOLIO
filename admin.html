@@ -57,7 +57,7 @@ summary img{width:48px;height:36px;object-fit:cover;border-radius:6px;background
 <script>
 (function(){
 var DB=window.SiteDB,S,tab='Site',t0;
-var tabs=['Site','Home','About','Projects','Brands','Contact','Publish'];
+var tabs=['Site','Home','About','Services','Projects','Brands','Contact','Effects','Publish'];
 function el(h){var t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild}
 function save(){document.getElementById('st').textContent='Saving…';clearTimeout(t0);t0=setTimeout(function(){DB.set('draft',S).then(function(){document.getElementById('st').textContent='Saved in this browser (not live yet)'})},300)}
 function fld(o,k,label,area){var w=el('<div><label>'+label+'</label></div>'),i=el(area?'<textarea></textarea>':'<input type="text">');i.value=o[k]||'';i.oninput=function(){o[k]=i.value;save()};w.appendChild(i);return w}
@@ -70,6 +70,9 @@ function trim(url){return new Promise(function(ok){var im=new Image();im.onerror
  var w=x1-x0+1,h=y1-y0+1,o=document.createElement('canvas');o.width=w;o.height=h;o.getContext('2d').drawImage(c,x0,y0,w,h,0,0,w,h);ok(o.toDataURL('image/png'))};im.src=url})}
 function hasA(im){var s=Math.min(1,200/Math.max(im.naturalWidth||im.width,im.naturalHeight||im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round((im.naturalWidth||im.width)*s));c.height=Math.max(1,Math.round((im.naturalHeight||im.height)*s));var g=c.getContext('2d');g.drawImage(im,0,0,c.width,c.height);var d=g.getImageData(0,0,c.width,c.height).data;for(var i=3;i<d.length;i+=4)if(d[i]<250)return true;return false}
 function clr(o,k,label,def){var w=el('<div><label>'+label+'</label><input type="color"></div>'),i=w.querySelector('input');i.value=o[k]||def;i.oninput=function(){o[k]=i.value;save()};return w}
+function cko(o,k,label,def){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=o[k]==null?def:!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
+function pdfUp(fn){var i=document.createElement('input');i.type='file';i.accept='application/pdf';i.style.display='none';document.body.appendChild(i);i.onchange=function(){var f=i.files[0];document.body.removeChild(i);if(!f)return;if(f.size>5*1024*1024){alert('That PDF is larger than 5 MB. Please compress it first.');return}var r=new FileReader();r.onload=function(){fn(String(r.result).replace(/^data:[^;]*;/,'data:application/pdf;'))};r.readAsDataURL(f)};i.click()}
+var DEF={services:{on:true,title:'What I *do*',intro:'Design for brands, publications and products.',items:[{t:'Brand identity',d:'Logos, colour and type systems, stationery and brand guidelines.'},{t:'Editorial & print',d:'Magazines, brochures, calendars, report cards and other printed materials.'},{t:'Packaging',d:'Boxes, bags, labels and product packaging that feel premium.'},{t:'Textile & illustration',d:'Fabric prints and digital illustration.'},{t:'Motion & UI/UX',d:'Motion design and interface design, a growing part of my work.'}],stepsTitle:'How we *work* together',steps:[{t:'Discover',d:'Understanding your brand, audience and goals.'},{t:'Concept',d:'Sketches, moodboards and first directions.'},{t:'Design',d:'Refining the chosen direction into the full system.'},{t:'Deliver',d:'Print-ready and screen-ready files, with guidelines.'}]},cta:{on:true,text:'LET’S WORK TOGETHER',link:'contact.html',stalk:300,hunt:150,critical:45,absorb:450,pull:34,tendrils:14,from:'edge'},fx:{}};
 function lst(o,k,label){var w=el('<div><label>'+label+'</label></div>'),i=el('<input type="text">');i.value=(o[k]||[]).join(', ');i.oninput=function(){o[k]=i.value.split(',').map(function(s){return s.trim()}).filter(Boolean);save()};w.appendChild(i);return w}
 function ck(o,k,label){var w=el('<label class="ck"><input type="checkbox"> '+label+'</label>'),i=w.firstChild;i.checked=!!o[k];i.onchange=function(){o[k]=i.checked;save()};return w}
 function box(title,hint){return el('<div class="box"><h2>'+title+'</h2><p class="hint">'+(hint||'')+'</p></div>')}
@@ -161,7 +164,15 @@ var views={
   var fx=box('Where contact messages go','Without a form address, the Send button opens the visitor’s email app with the message ready to send to your email above. To receive messages straight in your inbox instead, paste a form address here.');
   fx.appendChild(fld(S.contact,'formUrl','Form address (from Formspree, optional)'));
   fx.appendChild(el('<ol class="steps"><li>Go to <b>formspree.io</b> and create a free account.</li><li>Create a new form and enter the email where you want to receive messages.</li><li>Copy the form address (it looks like https://formspree.io/f/abcdwxyz) and paste it above.</li><li>Publish, then send yourself a test message from the Contact page. The first time, Formspree may ask you to confirm your email.</li></ol><p class="hint">The free Formspree plan has a monthly limit on messages.</p>'));
-  m.appendChild(fx)},
+  m.appendChild(fx);
+  var cw=box('CV and WhatsApp','A Download CV button appears on the Home About section and on the About page. A floating WhatsApp button appears on every page, and a WhatsApp line on the Contact page.'),C=S.contact,cr=el('<div class="row"></div>');
+  cr.appendChild(el('<label style="margin:0">CV (PDF, up to 5 MB)</label>'));
+  cr.appendChild(btn(C.cv?'Replace CV':'Upload CV',function(){pdfUp(function(d){C.cv=d;save();draw()})}));
+  if(C.cv)cr.appendChild(btn('Remove CV',function(){C.cv='';save();draw()},'del'));
+  cw.appendChild(cr);cw.appendChild(el('<p class="hint">'+(C.cv?'A CV file is attached.':'No CV uploaded yet.')+' Or, instead of uploading, paste a link to your CV below (for example a Google Drive share link). A link takes priority over an uploaded file.</p>'));
+  add(cw,[fld(C,'cvUrl','CV link (optional)'),fld(C,'whatsapp','WhatsApp number, with country code (e.g. 8801XXXXXXXXX)'),fld(C,'waMsg','Message pre-filled when someone taps the WhatsApp button'),cko(C,'waFloat','Show the floating WhatsApp button on every page',true)]);
+  cw.appendChild(el('<p class="hint">A Bangladesh number typed as 01XXXXXXXXX is converted to 8801XXXXXXXXX automatically. Leave the number empty to hide WhatsApp everywhere.</p>'));
+  m.appendChild(cw)},
  Brands:function(m){
   var B=S.brands,b=box('Brands I’ve worked with','Logos scroll across the page from right to left, after Featured work on the Home page and on the Work page. Add as many as you like. Transparent PNG or SVG logos work best, and empty transparent edges are trimmed automatically so every logo sits at the same height.');
   add(b,[fld(B,'title','Section title'),ck(B,'mono','Show all logos in white (tick this if your logos are dark and hard to see)'),sld(B,'speed','Scroll speed',0,10,0.5,3,'0 stops the scrolling, 3 is the default, 10 is fast.'),sld(B,'size','Logo height (px)',30,140,2,64,'Every logo is shown at this height, and the width follows each logo’s shape.')]);m.appendChild(b);
@@ -193,6 +204,29 @@ var views={
    r.appendChild(btn('Remove project',function(){if(confirm('Remove “'+p.title+'” and its images?')){S.projects.splice(i,1);save();draw()}},'del'));n.appendChild(r);
    m.appendChild(d)});
   m.appendChild(btn('+ Add project',function(){S.projects.push({id:'p'+Date.now(),title:'New project',summary:'',desc:'',tags:[],client:'',date:'',role:'Graphic designer',featured:false,cover:'',images:[],color:'p2',_open:true});save();draw()},'pri'))},
+ Services:function(m){
+  var V=S.services,b=box('Services section','Shown on the Home page after the brand logos. Put *asterisks* around a word to show it in italic serif.');
+  add(b,[cko(V,'on','Show the Services section on the Home page',true),fld(V,'title','Title'),fld(V,'intro','Short intro line'),el('<h3>Services</h3>'),items(V,'items',[['t','Service name'],['d','Short description',1]],{t:'New service',d:''},'service'),el('<h3>How we work together (process steps)</h3>'),fld(V,'stepsTitle','Process title'),items(V,'steps',[['t','Step name'],['d','Short description',1]],{t:'New step',d:''},'step')]);
+  m.appendChild(b)},
+ Effects:function(m){
+  var F=S.fx,C=S.cta,b=box('Call-to-action button','The black button on the Home page whose tendrils reach for the cursor. The three distances are how close the cursor must get, in pixels, for each stage. Keep Stalk larger than Hunt, and Hunt larger than Absorb. Use Preview site to feel the changes.');
+  add(b,[cko(C,'on','Show the button on the Home page',true),fld(C,'text','Button text'),fld(C,'link','Where it goes (a page such as contact.html, or a full web address)'),
+   sld(C,'stalk','Stalk distance: the tendrils wake up',100,600,10,300,'How far away the first tendrils start to notice the cursor.'),
+   sld(C,'hunt','Hunt distance: the tendrils wrap the cursor',50,400,10,150,'Closer than this, the tendrils wrap around the cursor and pull it toward the button.'),
+   sld(C,'critical','Absorb distance: the button grabs and opens the link',20,120,5,45,'Closer than this, the button absorbs the cursor and opens the link.'),
+   sld(C,'absorb','Absorb time (milliseconds)',150,1500,50,450,'How long the cursor must stay in the absorb zone before the link opens. Longer is safer for accidental passes.'),
+   sld(C,'pull','Pull strength (px)',0,80,2,34,'How far the drawn cursor is pulled toward the button. The real cursor never moves.'),
+   sld(C,'tendrils','Number of tendrils',4,24,1,14,'More tendrils look denser but cost a little more speed on older phones.'),
+   sel(C,'from','Measure the distances from',[['edge','The outline of the button'],['center','The centre of the button']])]);
+  m.appendChild(b);
+  var s=box('Scroll, hover and page effects','Turn each effect on or off and set how strong it is. Changes show in Preview site.');
+  add(s,[cko(F,'reveal','Fade-in as you scroll',true),sld(F,'revealDist','Fade-in distance (px)',0,80,2,28,'How far things slide up while fading in. 0 makes them only fade.'),sld(F,'revealSpeed','Fade-in time (seconds)',0.2,2,0.1,0.9,'Longer feels slower and softer.'),
+   cko(F,'intro','Page-load animation (headline and buttons rise in)',true),
+   sld(F,'zoom','Project image zoom on hover',1,1.2,0.01,1.06,'1 turns the zoom off.'),
+   cko(F,'cursor','Round “View” cursor over project cards (desktop only)',true),sld(F,'cursorSize','“View” circle size (px)',60,140,4,92,''),
+   cko(F,'magnet','Buttons lean toward the cursor (desktop only)',true),sld(F,'magnetStr','Button lean strength',0,0.5,0.02,0.18,''),
+   cko(F,'progress','Thin scroll-progress line at the top',true),sld(F,'grain','Film-grain strength',0,0.2,0.01,0.07,'0 removes the grain.')]);
+  m.appendChild(s);m.appendChild(el('<p class="hint">The 3D hero (style, tilt, depth), the headline box and the floating-card drift speed are in the Home tab. The logo strip speed and size are in the Brands tab. Visitors who turn on reduced motion in their device settings see none of these animations.</p>'))},
  Publish:function(m){
   direct(m);
   var b=box('Or publish by hand','Your edits are saved in this browser only. If you prefer not to use a token:');
@@ -201,7 +235,7 @@ var views={
   var r=el('<div class="row"></div>');r.appendChild(btn('Download content.js',dl,'pri'));
   r.appendChild(btn('Discard my edits and go back to the live version',function(){if(confirm('Discard all unpublished edits in this browser?'))DB.del('draft').then(function(){S=JSON.parse(JSON.stringify(window.SITE));fix();draw()})},'del'));b.appendChild(r);m.appendChild(b)}
 };
-function fix(){S.brands=S.brands||{title:'Brands I’ve worked with',mono:false,items:[]};S.about=S.about||{};S.contact.socials=S.contact.socials||[]}
+function fix(){['services','cta','fx'].forEach(function(k){if(!S[k])S[k]=JSON.parse(JSON.stringify((window.SITE&&window.SITE[k])||DEF[k]))});S.services.items=S.services.items||[];S.services.steps=S.services.steps||[];S.brands=S.brands||{title:'Brands I’ve worked with',mono:false,items:[]};S.about=S.about||{};S.contact.socials=S.contact.socials||[]}
 function cu(u){u=(u||'').trim();return /^#.*[.\/:@]/.test(u)?u.slice(1):u}
 function clean(){var D=JSON.parse(JSON.stringify(S));D.projects.forEach(function(p){delete p._open});D.contact.socials.forEach(function(k){k.u=cu(k.u)});((D.brands||{}).items||[]).forEach(function(k){k.url=cu(k.url)});return D}
 function out(){return 'window.SITE = '+JSON.stringify(clean(),null,1)+';\n'}
@@ -213,11 +247,12 @@ function gh(g,st){
  var root='https://api.github.com/repos/'+encodeURIComponent(g.owner.trim())+'/'+encodeURIComponent(g.repo.trim())+'/contents/',br=(g.branch||'main').trim(),
  hd={'Authorization':'Bearer '+g.token.trim(),'Accept':'application/vnd.github+json'},jh=Object.assign({'Content-Type':'application/json'},hd),D=clean(),map={},list=[];
  function bad(r){var e=new Error('');e.status=r.status;return r.json().then(function(x){e.message=x.message||'';throw e},function(){throw e})}
- walk(D,function(v){var m=/^data:image\/(png|jpeg);base64,/.exec(v);if(m&&!map[v]){map[v]='images/'+h53(v)+'-'+v.length.toString(36)+'.'+(m[1]==='png'?'png':'jpg');list.push(v)}return v});
+ walk(D,function(v){var m=/^data:(image\/(png|jpeg)|application\/pdf);base64,/.exec(v);if(m&&!map[v]){var pdf=m[1]==='application/pdf';map[v]=(pdf?'files/':'images/')+h53(v)+'-'+v.length.toString(36)+'.'+(pdf?'pdf':m[1]==='image/png'?'png':'jpg');list.push(v)}return v});
  walk(D,function(v){return map[v]||v});
  st('Checking the repository…');
- return fetch(root+'images?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return [];if(!r.ok)return bad(r);return r.json()}).then(function(ex){
-  var have={};(Array.isArray(ex)?ex:[]).forEach(function(f){have['images/'+f.name]=1});
+ function dir(n){return fetch(root+n+'?ref='+encodeURIComponent(br),{headers:hd}).then(function(r){if(r.status===404)return [];if(!r.ok)return bad(r);return r.json()}).then(function(a){return (Array.isArray(a)?a:[]).map(function(f){return n+'/'+f.name})})}
+ return Promise.all([dir('images'),dir('files')]).then(function(ex){
+  var have={};ex[0].concat(ex[1]).forEach(function(p){have[p]=1});
   var todo=list.filter(function(v){return !have[map[v]]}),ch=Promise.resolve();
   todo.forEach(function(v,n){ch=ch.then(function(){st('Uploading image '+(n+1)+' of '+todo.length+'…');return fetch(root+map[v],{method:'PUT',headers:jh,body:JSON.stringify({message:'Add image',content:v.split(',')[1],branch:br})}).then(function(r){if(!r.ok&&r.status!==422)return bad(r)})})});
   return ch}).then(function(){
