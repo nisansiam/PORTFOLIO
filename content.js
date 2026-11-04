@@ -150,7 +150,7 @@ window.SITE = {
   "critical": 45,
   "absorb": 450,
   "pull": 46,
-  "tendrils": 14,
+  "tendrils": 24,
   "from": "center"
  },
  "fx": {},
