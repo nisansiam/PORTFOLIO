@@ -7,3 +7,5 @@ HOW TO PUT THIS ON GITHUB PAGES
 HOW TO EDIT LATER
 Open https://YOUR-USERNAME.github.io/portfolio/admin.html, edit, click "Download content.js",
 then upload that file to the repository (it replaces the old one) and commit.
+
+SYMBIOTE CTA: also upload symbiote-cta.js and symbiote-cta.css (they are used by index.html). Radii and timing are at the top of symbiote-cta.js.
