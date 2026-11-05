@@ -271,20 +271,39 @@ window.SITE = {
   },
   {
    "id": "color-craze",
-   "title": "Color Craze",
-   "summary": "Textile design, 2024–2025.",
-   "desc": "Textile design work from 2024–2025.",
+   "title": "Social Media Design for Younic Limited",
+   "summary": "Corporate social media creatives for cultural celebrations, special occasions, announcements, and recruitment campaigns.",
+   "desc": "A collection of social media designs developed for Younic Limited, the parent company behind multiple business ventures. The project includes corporate communication, festive greetings, cultural and national observances, employee-related announcements, and recruitment campaigns.\n\nThe creative direction focuses on maintaining a professional and consistent corporate identity while adapting the visual approach to suit different occasions, messages, and communication objectives.",
    "tags": [
-    "Textile",
-    "Illustration"
+    "Social Media Design",
+    "Corporate Design",
+    "Corporate Communication",
+    "Brand Identity",
+    "Digital Marketing",
+    "Recruitment Design",
+    "Campaign Design",
+    "Promotional Graphics"
    ],
-   "client": "Color Craze",
-   "date": "2024–2025",
+   "client": "Younic Limited",
+   "date": "2026",
    "role": "Graphic designer",
    "featured": true,
-   "cover": "",
-   "images": [],
-   "color": "p3"
+   "cover": "images/2eym6ye7fnx-5ai7.jpg",
+   "images": [
+    "images/5aw3ouiyz3-4bmz.jpg",
+    "images/177lfm7lsbv-29vv.jpg",
+    "images/1lb7a7uovv3-4nwb.jpg",
+    "images/tk3t7z3qyx-6grb.jpg",
+    "images/1od51q3ujoo-1wb3.jpg",
+    "images/1bvh0gv7c46-c3zz.jpg",
+    "images/2eym6ye7fnx-5ai7.jpg",
+    "images/bvxr5vxt64-5grb.jpg",
+    "images/13y8pqmqkux-7wfv.jpg"
+   ],
+   "color": "p3",
+   "brief": "Create visually engaging social media content that strengthens Younic Limited's corporate presence, communicates important announcements, celebrates meaningful occasions, and maintains consistent brand communication across digital platforms.",
+   "process": "Developed individual creative concepts based on the purpose and message of each post. Applied the company's visual identity through typography, colour coordination, layout composition, and supporting graphics, ensuring that each design remained distinctive while retaining a consistent corporate look.",
+   "result": "A diverse collection of corporate social media creatives covering seasonal celebrations, cultural observances, appreciation posts, company announcements, and recruitment communication."
   },
   {
    "id": "shorodindu",
