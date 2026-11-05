@@ -9,7 +9,7 @@ window.SITE = {
   "center": "PORTFOLIO",
   "favicon": "images/1bijbfdumla-9uq.png"
  },
- "layout": "grid",
+ "layout": "natural",
  "brands": {
   "title": "Brands I’ve worked with",
   "mono": false,
@@ -200,41 +200,74 @@ window.SITE = {
  "projects": [
   {
    "id": "younic-home",
-   "title": "Younic Home",
-   "summary": "Magazine and editorial design.",
-   "desc": "Magazine and editorial design for Younic Home.",
-   "brief": "",
-   "process": "",
-   "result": "",
+   "title": "Social Media Design for Younic Home",
+   "summary": "Marketing and social media creatives for campaigns, promotions, and cultural celebrations.",
+   "desc": "A collection of social media designs created for Younic Home, a student accommodation and dormitory brand. The project covers a variety of visual communication needs, including promotional campaigns, special offers, seasonal greetings, cultural celebrations, and engaging social media content.\n\nThe designs aim to maintain brand consistency while communicating different messages through engaging layouts, typography, colours, and visual storytelling.",
+   "brief": "Create engaging and visually consistent social media content that strengthens Younic Home's brand presence, promotes its services, and connects with its target audience through relevant campaigns and occasions.",
+   "process": "Developed creative concepts based on individual campaign objectives, followed by layout composition, typography selection, colour coordination, and visual execution. Each design was adapted to its specific message while maintaining consistency with Younic Home's visual identity.",
+   "result": "A diverse collection of social media creatives covering promotional activities, special occasions, cultural events, and audience engagement, helping maintain an active and recognisable brand presence across social platforms.",
    "tags": [
-    "Editorial",
-    "Layout"
+    "Social Media Design",
+    "Marketing Design",
+    "Promotional Design",
+    "Campaign Design",
+    "Digital Advertising",
+    "Brand Communication"
    ],
-   "client": "Younic Limited",
-   "date": "",
+   "client": "Younic Home",
+   "date": "2026",
    "role": "Graphic designer",
    "featured": true,
-   "cover": "",
-   "images": [],
+   "cover": "images/va55agz998-77hv.jpg",
+   "images": [
+    "images/289jztdgeh2-6at3.jpg",
+    "images/362m7o1344-28o7.jpg",
+    "images/zmchjm0ye6-8cab.jpg",
+    "images/e61jbn93xc-actv.jpg",
+    "images/25j224hgdxq-897n.jpg",
+    "images/va55agz998-77hv.jpg",
+    "images/1eatuld4vz1-9lfj.jpg",
+    "images/x9p2ge8uu2-aeej.jpg",
+    "images/6h5wrp6vzk-4rlr.jpg",
+    "images/zriv8g9gtl-b0lf.jpg"
+   ],
    "color": "p1"
   },
   {
    "id": "seito-kashikoi",
-   "title": "Seito Kashikoi School",
-   "summary": "Brochure and marketing materials for a Cambridge-curriculum school.",
-   "desc": "Brochure, social media designs, calendars, report cards and syllabus layouts.",
+   "title": "Social Media Design for Seito Kashikoi School",
+   "summary": "Educational marketing and social media creatives for admissions, recruitment, celebrations, and school communications.",
+   "desc": "A collection of social media designs created for Seito Kashikoi School, covering educational promotions, admission campaigns, recruitment announcements, and special occasion communications.\n\nThe project focuses on creating a friendly, engaging, and visually consistent design language that reflects the school's educational values while communicating important announcements to parents, students, and the wider community.",
    "tags": [
-    "Brochure",
-    "Social media",
-    "Print"
+    "Social Media Design",
+    "Educational Marketing",
+    "Admission Campaign",
+    "Recruitment Design",
+    "Promotional Design",
+    "Digital Advertising",
+    "Brand Communication"
    ],
    "client": "Seito Kashikoi School",
    "date": "2026",
    "role": "Graphic designer",
    "featured": true,
-   "cover": "",
-   "images": [],
-   "color": "p2"
+   "cover": "images/1tr5t0p0wxj-cngz.jpg",
+   "images": [
+    "images/20e25pi492h-5v07.jpg",
+    "images/j7qrrmvd06-c83j.jpg",
+    "images/1tr5t0p0wxj-cngz.jpg",
+    "images/aahw6dv39u-bufz.jpg",
+    "images/186cldmhwrk-aedv.jpg",
+    "images/dqms8flarw-ajgf.jpg",
+    "images/1zykqju9yxt-4g4r.jpg",
+    "images/1mcqynk215-bkdf.jpg",
+    "images/29w9xpkqnyy-42dn.jpg",
+    "images/1dn6naznyfi-8ejr.jpg"
+   ],
+   "color": "p2",
+   "brief": "Develop engaging social media content to promote school admissions, communicate recruitment opportunities, celebrate special occasions, and strengthen the school's digital presence.",
+   "process": "Created campaign-specific visual concepts using the school's brand identity, colour palette, and typography. Each design was tailored to its communication purpose, balancing a child-friendly aesthetic with clear information hierarchy and professional presentation.",
+   "result": "A versatile collection of social media creatives supporting the school's admission campaigns, recruitment activities, and occasion-based communications while maintaining a consistent visual identity."
   },
   {
    "id": "color-craze",
