@@ -24,5 +24,5 @@ SERVICES, CV, WHATSAPP
 - With "Publish now", a CV PDF is saved in a files folder and images in an images folder.
 
 TYPEWRITER HERO
-- Upload typewriter-hero.js, typewriter-hero.css and the whole typewriter folder (machine.webp, lever.webp). Also replace index.html, site.js and admin.html.
+- Upload typewriter-hero.js, typewriter-hero.css and machine.webp and lever.webp (in the same folder as index.html). Also replace index.html, site.js and admin.html.
 - Admin > Home > Hero style lets you choose Typewriter or Floating cards. The typewriter types the Headline (2 lines) and Intro fields, and the keys follow whatever you write.

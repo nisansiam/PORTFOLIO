@@ -2,7 +2,9 @@
    Keys on the photo press for whatever letters are typed; the lever is pulled down at the end of each line. */
 (function(){
 'use strict';
-var NS='http://www.w3.org/2000/svg',BASE=322,CX=768,MAXW=470,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+var NS='http://www.w3.org/2000/svg',BASE=322,CX=768,MAXW=470,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches,
+ DESK={vb:'188 0 1160 970',fs:27,lh:44,pt:18},      /* desktop: view is centred on the machine BODY (x=768), lever hangs out to the left */
+ MOB={vb:'188 -260 1160 1230',fs:38,lh:50,pt:-240};   /* phone: whole machine fits; taller paper so the text can be bigger */
 function boot(){var el=document.querySelector('[data-tw]');if(!el||el._tw)return false;el._tw=1;start(el);return true}
 if(!boot()){var mo=new MutationObserver(function(){if(boot())mo.disconnect()});mo.observe(document.documentElement,{childList:true,subtree:true})}
 var sleep=function(ms){return new Promise(function(r){setTimeout(r,ms)})};
@@ -19,30 +21,31 @@ function posFor(ch){var u=ch.toUpperCase();return POS[u]||ALT[ch]||POS[LETTERS[c
 function start(host){
  var H=(window.SITE&&window.SITE.home)||{},strip=function(s){return String(s||'').replace(/\*/g,'').trim()},
   speed=H.twSpeed>0?+H.twSpeed:1,loop=H.twLoop!=='once',holder=host.querySelector('.tws');
- var sv=holder.appendChild(mk('svg',{viewBox:'190 0 970 970',preserveAspectRatio:'xMidYMid meet',role:'img'}));
+ var sv=holder.appendChild(mk('svg',{viewBox:'188 0 1160 970',preserveAspectRatio:'xMidYMid meet',role:'img'}));
  var defs=mk('defs',{},sv);
- mk('image',{id:'twm',x:190,y:0,width:970,height:970,href:'machine.webp'},defs);
+ mk('image',{id:'twm',x:190,y:0,width:970,height:970,href:'machine.webp?v=3'},defs);
  var g1=mk('linearGradient',{id:'twpg',x1:0,y1:0,x2:1,y2:0},defs);[[0,'#ece4d8'],[.05,'#f6efe4'],[.95,'#f6efe4'],[1,'#e9e1d4']].forEach(function(s){mk('stop',{offset:s[0],'stop-color':s[1]},g1)});
  var g2=mk('linearGradient',{id:'twsh',x1:0,y1:0,x2:0,y2:1},defs);mk('stop',{offset:0,'stop-color':'#3a2a14','stop-opacity':0},g2);mk('stop',{offset:1,'stop-color':'#3a2a14','stop-opacity':.2},g2);
  var paper=mk('g',{},sv),lines=mk('g',{class:'twl'},mk('g',{},paper));
- mk('rect',{x:498,y:0,width:540,height:560,fill:'url(#twpg)'},paper);paper.appendChild(lines.parentNode);
+ var prect=mk('rect',{x:498,y:0,width:540,height:560,fill:'url(#twpg)'},paper);paper.appendChild(lines.parentNode);
  var caret=mk('rect',{class:'twc',width:3,height:28,style:'opacity:0'},paper);
  mk('rect',{x:498,y:270,width:540,height:66,fill:'url(#twsh)'},sv);
  mk('use',{href:'#twm'},sv);
- var lever=mk('g',{},sv);mk('image',{x:196,y:215,width:250,height:275,href:'lever.webp'},lever);
+ var lever=mk('g',{},sv);mk('image',{x:196,y:215,width:274,height:275,href:'lever.webp?v=3'},lever);
+ mk('image',{x:437,y:235,width:28,height:28,href:'hinge.webp?v=3'},sv); /* the pivot screw stays still on top of the swinging lever */
  var keysG=mk('g',{},sv);
 
- var mq=matchMedia('(max-width:700px)'),vb=function(){sv.setAttribute('viewBox',mq.matches?'470 0 596 600':'190 0 970 970')};vb();mq.addEventListener('change',vb);
+ var mq=matchMedia('(max-width:700px)'),P=function(){return mq.matches?MOB:DESK},PT=18,vb=function(){sv.setAttribute('viewBox',P().vb)};vb();
 
  /* ---- layout: wrap the admin text into lines and centre each one on the paper ---- */
  var probe=mk('text',{y:0,style:'opacity:0'},lines),TXT=[],LH=44,TOP=60,LX=[],made={};
  function w(s){probe.textContent=s;return probe.getComputedTextLength()}
- function wrap(par){var out=[];String(par).split(/\n/).forEach(function(p){var words=p.split(/\s+/).filter(Boolean),cur='';words.forEach(function(x){var t=cur?cur+' '+x:x;if(cur&&w(t)>MAXW){out.push(cur);cur=x}else cur=t});if(cur)out.push(cur)});return out}
+ function wrap(par){var out=[];String(par).split(/\n/).forEach(function(p){var words=p.split(/\s+/).filter(Boolean),cur='';words.forEach(function(x){var t=cur?cur+' '+x:x;if(cur&&w(t)>MAXW*27/P().fs){out.push(cur);cur=x}else cur=t});if(cur)out.push(cur)});return out}
  function layout(){
   var head=wrap(strip(H.h1a)).concat(wrap(strip(H.h1b))),body=wrap(strip(H.intro));
   TXT=head.concat(head.length&&body.length?['']:[],body);if(!TXT.length)TXT=['Hello'];
-  var n=TXT.length;LH=Math.min(44,260/Math.max(1,n-1));var fs=27*LH/44;lines.style.fontSize=fs+'px';
-  TOP=162-(n-1)*LH/2;
+  var n=TXT.length,p=P();PT=p.pt;LH=Math.min(p.lh,((328-p.pt)-50)/Math.max(1,n-1));var fs=p.fs*LH/p.lh;lines.style.fontSize=fs+'px';
+  TOP=((p.pt+328)/2+7)-(n-1)*LH/2-p.pt;prect.setAttribute('height',360-p.pt);
   while(lines.childNodes.length>1)lines.removeChild(lines.lastChild);
   LX=[];TXT.forEach(function(t,k){var el=mk('text',{y:TOP+k*LH},lines);el.style.fontSize=fs+'px';el.textContent=t;LX[k]=CX-el.getComputedTextLength()/2;el.setAttribute('x',LX[k]);el.textContent=''});
   sv.setAttribute('aria-label','A typewriter typing: '+TXT.join(' ').trim())}
@@ -60,7 +63,7 @@ function start(host){
   hide=function(d){paper.style.transition='transform '+d+'s ease-in';paper.style.transform='translateY(345px)'},
   moveCaret=function(k,s){caret.style.opacity=1;caret.setAttribute('x',LX[k]+lines.childNodes[k+1].getComputedTextLength()+2);caret.setAttribute('y',TOP+k*LH-23)};
  function reset(){for(var i=1;i<lines.childNodes.length;i++)lines.childNodes[i].textContent='';caret.style.opacity=0;paper.style.transition='none';paper.style.transform='translateY(345px)';paper.getBoundingClientRect()}
- function showAll(){TXT.forEach(function(t,k){lines.childNodes[k+1].textContent=t});caret.style.opacity=0;paper.style.transition='none';paper.style.transform='translateY(18px)'}
+ function showAll(){TXT.forEach(function(t,k){lines.childNodes[k+1].textContent=t});caret.style.opacity=0;paper.style.transition='none';paper.style.transform='translateY('+PT+'px)'}
 
  var vis=true,run=0;if('IntersectionObserver' in window)new IntersectionObserver(function(e){vis=e[0].isIntersecting}).observe(host);
  async function wait(ms,alive){await sleep(ms);while((!vis||document.hidden)&&alive())await sleep(300)}
@@ -73,11 +76,11 @@ function start(host){
    for(var i=1;i<=t.length;i++){if(!alive())return;var ch=t[i-1];el.textContent=t.slice(0,i).replace(/ $/,'\u00a0');if(ch!==' ')press(ch);else press(' ');moveCaret(k);
     await wait((55+Math.random()*75+(',.'.indexOf(ch)>-1?130:0))/speed,alive)}
   }
-  caret.style.opacity=0;pullLever();await wait(110,alive);if(!alive())return;paper.style.transition='transform .9s ease';paper.style.transform='translateY(18px)'; /* last lever pull: paper rises so the text sits in the middle */
+  caret.style.opacity=0;pullLever();await wait(110,alive);if(!alive())return;paper.style.transition='transform .9s ease';paper.style.transform='translateY('+PT+'px)'; /* last lever pull: paper rises so the text sits in the middle */
   if(!loop)return;await wait(6500,alive);if(!alive())return;hide(1.2);await wait(1800,alive);if(alive())play()}
 
  /* ---- lever: pulled down at the end of every line (carriage return), then springs back ---- */
- function setLever(a){lever.setAttribute('transform','rotate('+(-a).toFixed(2)+' 448 248)')}
+ function setLever(a){lever.setAttribute('transform','rotate('+(-a).toFixed(2)+' 451.3 249)')}
  var lraf=0;
  function pullLever(){var t0=performance.now(),D=180,Hd=60,R=320,MAX=28;cancelAnimationFrame(lraf);
   (function step(now){var t=now-t0,a;
@@ -88,6 +91,7 @@ function start(host){
    setLever(a);lraf=requestAnimationFrame(step)})(t0)}
 
  var go=function(){layout();if(reduce)showAll();else play()};
+ mq.addEventListener('change',function(){vb();go()}); /* rotate the phone / resize across the breakpoint: re-layout and replay */
  (document.fonts&&document.fonts.load?document.fonts.load("27px 'Special Elite'").catch(function(){}):Promise.resolve()).then(function(){return document.fonts?document.fonts.ready:0}).then(go);
  sv.addEventListener('click',function(){if(!reduce)play()});sv.style.cursor='pointer';
 }

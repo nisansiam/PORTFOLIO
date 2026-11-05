@@ -19,4 +19,4 @@
 .twb .btns{margin:0}
 .twb .av{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute)}
 .twsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-@media (max-width:700px){.tw{min-height:0}.tws{flex:none;aspect-ratio:596/600}}
+@media (max-width:700px){.tw{min-height:0}.tws{flex:none;aspect-ratio:1160/1230}}
