@@ -1,5 +1,5 @@
 /* Typewriter hero. Types the Home headline + intro from the admin panel (content.js: home.h1a, h1b, intro).
-   Keys on the photo press for whatever letters are typed; the lever swings down as the page scrolls. */
+   Keys on the photo press for whatever letters are typed; the lever is pulled down at the end of each line. */
 (function(){
 'use strict';
 var NS='http://www.w3.org/2000/svg',BASE=322,CX=768,MAXW=470,reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -68,19 +68,24 @@ function start(host){
   var my=++run,alive=function(){return my===run};reset();await wait(700,alive);if(!alive())return;
   setPaper(0,1.7);await wait(2000,alive);                                   /* sheet feeds out of the roller */
   for(var k=0;k<TXT.length;k++){
-   if(k>0){if(!alive())return;setPaper(k,.45);await wait(560,alive)}        /* line feed */
+   if(k>0){if(!alive())return;pullLever();await wait(110,alive);setPaper(k,.45);await wait(620,alive)} /* lever down, paper rolls up one line */
    var t=TXT[k],el=lines.childNodes[k+1];
    for(var i=1;i<=t.length;i++){if(!alive())return;var ch=t[i-1];el.textContent=t.slice(0,i).replace(/ $/,'\u00a0');if(ch!==' ')press(ch);else press(' ');moveCaret(k);
     await wait((55+Math.random()*75+(',.'.indexOf(ch)>-1?130:0))/speed,alive)}
   }
-  caret.style.opacity=0;paper.style.transition='transform .9s ease';paper.style.transform='translateY(18px)'; /* pull the page up so the text sits in the middle */
+  caret.style.opacity=0;pullLever();await wait(110,alive);if(!alive())return;paper.style.transition='transform .9s ease';paper.style.transform='translateY(18px)'; /* last lever pull: paper rises so the text sits in the middle */
   if(!loop)return;await wait(6500,alive);if(!alive())return;hide(1.2);await wait(1800,alive);if(alive())play()}
 
- /* ---- lever: pushed down as the page scrolls up ---- */
- var cur=0,tgt=0,raf=0;
- function frame(){raf=0;cur+=(tgt-cur)*.14;if(Math.abs(tgt-cur)<.05)cur=tgt;lever.setAttribute('transform','rotate('+(-cur).toFixed(2)+' 448 248)');if(cur!==tgt)raf=requestAnimationFrame(frame)}
- function onScroll(){if(reduce)return;tgt=Math.min(1,Math.max(0,scrollY/(host.offsetHeight*.85)))*28;if(!raf)raf=requestAnimationFrame(frame)}
- addEventListener('scroll',onScroll,{passive:true});onScroll();
+ /* ---- lever: pulled down at the end of every line (carriage return), then springs back ---- */
+ function setLever(a){lever.setAttribute('transform','rotate('+(-a).toFixed(2)+' 448 248)')}
+ var lraf=0;
+ function pullLever(){var t0=performance.now(),D=180,Hd=60,R=320,MAX=28;cancelAnimationFrame(lraf);
+  (function step(now){var t=now-t0,a;
+   if(t<D){var u=t/D;a=MAX*(1-Math.pow(1-u,3))}                       /* quick pull down */
+   else if(t<D+Hd)a=MAX                                                /* held at the bottom */
+   else if(t<D+Hd+R){var v=(t-D-Hd)/R;a=MAX*(1-(v<.5?2*v*v:1-Math.pow(-2*v+2,2)/2))} /* springs back up */
+   else{setLever(0);return}
+   setLever(a);lraf=requestAnimationFrame(step)})(t0)}
 
  var go=function(){layout();if(reduce)showAll();else play()};
  (document.fonts&&document.fonts.load?document.fonts.load("27px 'Special Elite'").catch(function(){}):Promise.resolve()).then(function(){return document.fonts?document.fonts.ready:0}).then(go);
