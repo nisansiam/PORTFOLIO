@@ -21,7 +21,7 @@ function start(host){
   speed=H.twSpeed>0?+H.twSpeed:1,loop=H.twLoop!=='once',holder=host.querySelector('.tws');
  var sv=holder.appendChild(mk('svg',{viewBox:'190 0 970 970',preserveAspectRatio:'xMidYMid meet',role:'img'}));
  var defs=mk('defs',{},sv);
- mk('image',{id:'twm',x:190,y:0,width:970,height:970,href:'typewriter/machine.webp'},defs);
+ mk('image',{id:'twm',x:190,y:0,width:970,height:970,href:'machine.webp'},defs);
  var g1=mk('linearGradient',{id:'twpg',x1:0,y1:0,x2:1,y2:0},defs);[[0,'#ece4d8'],[.05,'#f6efe4'],[.95,'#f6efe4'],[1,'#e9e1d4']].forEach(function(s){mk('stop',{offset:s[0],'stop-color':s[1]},g1)});
  var g2=mk('linearGradient',{id:'twsh',x1:0,y1:0,x2:0,y2:1},defs);mk('stop',{offset:0,'stop-color':'#3a2a14','stop-opacity':0},g2);mk('stop',{offset:1,'stop-color':'#3a2a14','stop-opacity':.2},g2);
  var paper=mk('g',{},sv),lines=mk('g',{class:'twl'},mk('g',{},paper));
@@ -29,7 +29,7 @@ function start(host){
  var caret=mk('rect',{class:'twc',width:3,height:28,style:'opacity:0'},paper);
  mk('rect',{x:498,y:270,width:540,height:66,fill:'url(#twsh)'},sv);
  mk('use',{href:'#twm'},sv);
- var lever=mk('g',{},sv);mk('image',{x:196,y:215,width:250,height:275,href:'typewriter/lever.webp'},lever);
+ var lever=mk('g',{},sv);mk('image',{x:196,y:215,width:250,height:275,href:'lever.webp'},lever);
  var keysG=mk('g',{},sv);
 
  var mq=matchMedia('(max-width:700px)'),vb=function(){sv.setAttribute('viewBox',mq.matches?'470 0 596 600':'190 0 970 970')};vb();mq.addEventListener('change',vb);
