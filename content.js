@@ -134,7 +134,7 @@ window.SITE = {
    },
    {
     "n": "LinkedIn",
-    "u": "https://www.linkedin.com/in/aflahal-muminun"
+    "u": "https://www.linkedin.com/in/aflahal-muminun-a3b295178/"
    }
   ]
  },
