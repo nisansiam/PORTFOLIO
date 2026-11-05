@@ -57,6 +57,7 @@ function logoMq(){
 function aboutBlock(title,text,more){
  var A=S.about,ph=A.photo?'<img class="me" src="'+e(A.photo)+'" alt="'+e(S.brand.full)+'">':'';
  return '<div class="wrap abt'+(ph?'':' np')+'">'+ph+'<div><h2>'+rich(title)+'</h2>'+String(text||'').split('\n').filter(Boolean).map(function(t){return '<p>'+e(t)+'</p>'}).join('')+more+'</div></div>'}
+function heroTW(H){if((H.heroStyle||'typewriter')!=='typewriter')return '';return '<div class="tw" data-tw><h1 class="twsr">'+rich(H.h1a)+' '+rich(H.h1b)+'</h1><div class="tws"></div><div class="twb">'+(H.avail?'<div class="av"><i></i>'+e(H.avail)+'</div>':'')+'<div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div></div>'}
 function symCta(){var C=S.cta||{};if(C.on===false)return '';
  var d=function(k,v){return v==null||v===''?'':' data-sym-'+k+'="'+e(v)+'"'};
  return '<section class="sym-sec"><div class="wrap"><a class="symbiote-cta" data-symbiote href="'+e(href(C.link||'contact.html'))+'"'+d('stalk-radius',C.stalk)+d('hunt-radius',C.hunt)+d('critical-radius',C.critical)+d('absorb-ms',C.absorb)+d('max-pull',C.pull)+d('tendrils',C.tendrils)+d('measure-from',C.from)+'>'+e(C.text||'LET’S WORK TOGETHER')+'</a></div></section>'}
@@ -72,7 +73,7 @@ var views={
  home:function(){
   var H=S.home,F=featured(),fl=(H.floats||[]).slice(0,10).map(function(q,i){var d=' data-s="'+[.06,-.04,.09,-.07,.05,-.05,.08,-.09,.04,-.06][i]+'"';
    return q.img?'<div class="fl f'+(i+1)+' has"'+d+'><img src="'+e(q.img)+'" alt=""></div>':'<div class="fl f'+(i+1)+' p'+(i%4+1)+'"'+d+'></div>'}).join('');
-  return '<div class="hero wrap'+((H.heroMode||'3d')==='3d'?' d3':'')+'"><div class="stage">'+fl+'</div><div class="hbox" style="--bo:'+(H.boxOpacity==null?.4:H.boxOpacity)+'">'+(H.avail?'<div class="av"><i></i>'+e(H.avail)+'</div>':'')+'<h1>'+rich(H.h1a)+'<br><span class="mu">'+rich(H.h1b)+'</span></h1><p>'+e(H.intro)+'</p></div><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>'+
+  return (heroTW(H)||'<div class="hero wrap'+((H.heroMode||'3d')==='3d'?' d3':'')+'"><div class="stage">'+fl+'</div><div class="hbox" style="--bo:'+(H.boxOpacity==null?.4:H.boxOpacity)+'">'+(H.avail?'<div class="av"><i></i>'+e(H.avail)+'</div>':'')+'<h1>'+rich(H.h1a)+'<br><span class="mu">'+rich(H.h1b)+'</span></h1><p>'+e(H.intro)+'</p></div><div class="btns"><a class="pill" href="work.html">See my work <i>↗</i></a><a class="pill ghost" href="about.html">About me <i>↗</i></a></div></div>')+
   '<section><div class="wrap"><div class="center"><h2>'+rich(H.featTitle)+'</h2><p>'+e(H.featText)+'</p></div><div class="projects'+(S.layout==='natural'?' mas':'')+'">'+F.map(function(p,i){return card(p,true,i)}).join('')+'</div><div class="more"><a class="pill" href="work.html">View more <i>↗</i></a></div></div></section>'+brandsSec()+servicesSec()+
   '<section>'+aboutBlock(H.teaserTitle,H.teaserText,'<div class="btns" style="justify-content:flex-start;margin-top:32px"><a class="pill" href="about.html">More about me <i>↗</i></a>'+cvBtn()+'</div>')+'</section>'+symCta()+marquee();
  },
@@ -111,7 +112,7 @@ function wire(){
  menu.addEventListener('click',function(ev){if(ev.target.closest('a.big'))tog(false)});
  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')tog(false)});
  if(page==='home'){
-  var d3=(S.home.heroMode||'3d')==='3d',fl=[].slice.call(document.querySelectorAll('.fl')),m1=document.getElementById('m1'),m2=document.getElementById('m2'),mq=document.querySelector('.mq');
+  var d3=!document.querySelector('[data-tw]')&&(S.home.heroMode||'3d')==='3d',fl=[].slice.call(document.querySelectorAll('.fl')),m1=document.getElementById('m1'),m2=document.getElementById('m2'),mq=document.querySelector('.mq');
   var SP=S.home.floatSpeed==null?3:+S.home.floatSpeed,tick=function(){if(reduce)return;var y=scrollY,vh=innerHeight;if(!d3)fl.forEach(function(el){el.style.transform='translateY('+(-y*parseFloat(el.dataset.s)*2*SP)+'px)'});
    var r=mq.getBoundingClientRect(),p=(vh-r.top)/(vh+r.height);m1.style.transform='translateX('+(-p*30+10)+'%)';m2.style.transform='translateX('+(p*30-40)+'%)'};
   addEventListener('scroll',tick,{passive:true});addEventListener('resize',tick);tick();

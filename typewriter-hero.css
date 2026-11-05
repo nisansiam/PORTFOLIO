@@ -1,0 +1,22 @@
+/* Typewriter hero — styles. Self-contained; only affects .tw */
+.tw{position:relative;min-height:max(calc(100svh - 84px),560px);display:flex;flex-direction:column;align-items:center;overflow:hidden;isolation:isolate;
+ background:
+  radial-gradient(55% 42% at 50% -4%,rgba(255,214,150,.16),transparent 72%),
+  radial-gradient(80% 62% at 50% 54%,#1e1a14 0%,#0e0c0a 58%,#000 100%)}
+/* texture: film grain + faint vertical film scratches, so the black never looks flat */
+.tw::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background-image:
+  url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .96 0 0 0 0 .9 0 0 0 .26 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+  repeating-linear-gradient(90deg,transparent 0 83px,rgba(255,240,215,.028) 83px 84px,transparent 84px 211px,rgba(255,240,215,.02) 211px 212px,transparent 212px 347px,rgba(255,240,215,.032) 347px 348px)}
+.tw::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;box-shadow:inset 0 0 220px 40px rgba(0,0,0,.9)}
+.tws{position:relative;z-index:1;flex:1;width:min(100%,1500px)}
+.tws svg{position:absolute;inset:0;width:100%;height:100%;display:block;filter:drop-shadow(0 26px 34px rgba(0,0,0,.7))}
+.twl text{font:27px 'Special Elite','Noto Sans Bengali','Courier New',monospace;fill:#26221e}
+.twc{fill:#26221e;animation:twb 1s steps(1) infinite}@keyframes twb{50%{opacity:0}}
+.key .cap{transition:transform .05s}.key.down .cap{transform:translateY(4px)}
+.key .hole{opacity:0;transition:opacity .05s}.key.down .hole{opacity:1}
+.twb{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px;padding:14px 20px 30px}
+.twb .btns{margin:0}
+.twb .av{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mute)}
+.twsr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (max-width:700px){.tw{min-height:0}.tws{flex:none;aspect-ratio:596/600}}
