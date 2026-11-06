@@ -108,6 +108,8 @@ dialog dt{font-weight:700}dialog dd{color:var(--mute)}
 
 .abt{display:grid;grid-template-columns:minmax(240px,.8fr) 1.2fr;gap:clamp(28px,6vw,96px);align-items:center}
 .abt.np{grid-template-columns:1fr}
+/* desktop: photo + text stay side by side, but as one group centred on the page (phones unchanged) */
+@media (min-width:861px){.abt:not(.np){grid-template-columns:minmax(240px,460px) fit-content(720px);justify-content:center}}
 .abt h2{font-size:clamp(34px,4.6vw,72px)}
 .abt p{color:var(--mute);font-size:clamp(17px,1.5vw,21px);max-width:54ch;margin-top:18px}
 .abt h2+p{margin-top:28px}
